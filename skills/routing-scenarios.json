@@ -65,6 +65,16 @@
     ]
   },
   {
+    "scenario": "Frontend served from a different domain connects to Frappe Socket.IO through a same-origin /socket.io proxy",
+    "skills": [
+      "setup-frappe-realtime",
+      "flutter-networking",
+      "frappe-realtime-updates",
+      "flutter-web-deployment",
+      "project-connections"
+    ]
+  },
+  {
     "scenario": "Flutter color and icon settings backed by a Frappe form",
     "skills": [
       "frontend-forms",

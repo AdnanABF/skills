@@ -33,6 +33,17 @@ Apply to browser, mobile, desktop, and server-rendered frontend applications. Re
 - Keep server-side credentials scoped to the incoming request. Never mutate a shared server client's defaults with a user's token or cache authenticated responses across users.
 - Never log credentials, authorization headers, secrets, or sensitive authentication payloads.
 
+## Web Application Credential Security
+
+- For new web application token authentication, prefer a same-origin backend-for-frontend (BFF). Keep upstream API secrets, refresh tokens and authentication-source metadata on the server; browser JavaScript calls application endpoints, not the upstream token API.
+- Store credentials in a server-side session keyed by an opaque HttpOnly cookie, or in an authenticated-encrypted HttpOnly cookie. Do not expose token secrets in client props, JSON responses, localStorage, sessionStorage or JavaScript-readable cookies. An HttpOnly cookie alone is not encryption; never place plaintext API secrets in it.
+- Use Secure cookies on hosted HTTPS, an explicit SameSite policy, host-only scope, bounded expiry and purpose-bound authenticated encryption when using cookie payloads. Keep encryption/signing keys in private runtime configuration; never commit them or expose them through public environment variables. An HTTP localhost development exception must not weaken hosted settings.
+- Cookie-authenticated BFF mutations need CSRF protection even when the upstream uses token mode. Check the exact configured browser Origin for login, logout and other writes; enforce the expected content type or use a CSRF token. Do not trust caller-selected forwarding destinations or upstream redirects.
+- Validate credentials and current authorization server-side for protected routes and each feature API. Cookie presence and client route guards are not authorization. Return only minimal user metadata and mark authenticated responses no-store.
+- Keep browser-to-BFF cookie authentication distinct from BFF-to-backend token authentication. Preserve all backend-required token headers. Stable browser installation IDs may be persisted as non-secret metadata; native clients retain their platform-specific secure storage contract.
+- Logout must revoke upstream device/refresh credentials where the backend supports it, then clear browser authentication. Clearly distinguish local-only logout or failed revocation. Do not silently claim revocation when the backend is unreachable.
+- For an existing direct-token browser application, do not silently break shipped consumers. Document any justified exception and plan a deliberate migration to the BFF boundary.
+
 ## Failures And Concurrency
 
 - Centralize authentication-expiration side effects and leave routing to the existing auth/UI layer. Individual endpoints must not emit duplicate logout events.
@@ -49,6 +60,8 @@ Apply to browser, mobile, desktop, and server-rendered frontend applications. Re
 - Keep a clear error contract: either return the response for feature parsing or throw a normalized error, following the established platform pattern. Do not consume response bodies before feature parsing without preserving them.
 
 ## Verification
+
+- For web token auth, test that secrets never reach browser-readable storage or response bodies, cookie tampering/expiry fail closed, hosted cookies are Secure/HttpOnly, cross-origin writes fail, and live logout revokes the upstream credential.
 
 - Test latest credential injection, auxiliary authentication metadata, header merging, and caller-override prevention.
 - Test public/session modes, missing credentials, and rejection of unrelated destinations before transmission.

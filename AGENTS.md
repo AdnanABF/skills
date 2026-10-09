@@ -61,6 +61,8 @@ For admin listing pages, read `frontend-admin-panels.md`, `frontend-listing-scre
 
 For Frappe-backed listing pages that must update from server-side create, update, delete, workflow, or background-job changes, read `frappe-listing-realtime.md` after the listing platform adapter.
 
+For connecting a frontend to Frappe Socket.IO realtime from its own domain (cross-origin CORS/origin errors, `/socket.io` nginx proxy, socket base host), read `setup-frappe-realtime.md` after the platform adapter and before the deployment adapter.
+
 For any work that adds, changes, reviews, or optimizes multiple API calls or remote data loads, read `api-parallelization.md` alongside the platform adapter.
 
 For any frontend API-client, authentication-header, credential-persistence, or networking change on any platform, read `frontend-api-client.md` before the platform adapter. It owns shared transport/auth behavior; platform adapters own implementation syntax and storage. For Frappe auth, also read `frappe-api-contracts.md`. React/Vite fetch guidance is in the shared skill's browser-client reference.
@@ -115,7 +117,7 @@ For Pipecat self-hosting and production deployment, read `pipecat-self-hosting.m
 | `flutter-routing.md` | Navigation, route setup |
 | `flutter-android-release.md` | Flutter Android appbundle, Play Store, and Fastlane release scripts |
 | `flutter-ios-release.md` | Flutter iOS release, App Store, TestFlight, Xcode Organizer, Xcode Cloud ci_post_clone.sh, CocoaPods, and Swift Package Manager setup |
-| `flutter-deploy.md` | Flutter production branch promotion, version incrementing, and release scripts |
+| `flutter-deploy.md` | Flutter development/production branch promotion, version incrementing, release scripts, and deployment-result confirmation |
 | `flutter-phone-auth.md` | Use when implementing or fixing mobile phone authentication, OTP login, or registration flows powered by flutter_utils |
 
 ### Next.js Implementation
@@ -148,6 +150,7 @@ For Pipecat self-hosting and production deployment, read `pipecat-self-hosting.m
 | `frappe-notification-log.md` | Any creation, update, review, API response, or frontend display of Frappe Notification Log records |
 | `frappe-realtime-updates.md` | Any backend Frappe change or frontend listing/detail page that must refresh from server-pushed create, update, delete, workflow, or background-job events |
 | `setup-frappe-server.md` | Setting up or configuring a Frappe server, bench, sites, apps, services, or production prerequisites |
+| `setup-frappe-realtime.md` | Setting up or connecting Frappe Socket.IO realtime for a frontend served from a different domain, including the nginx `/socket.io` reverse proxy and socket base host configuration |
 
 ### Cross-Platform Technical
 

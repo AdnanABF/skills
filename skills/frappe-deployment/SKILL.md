@@ -71,8 +71,17 @@ Use this skill for the Frappe-specific lifecycle inside GitHub Actions developme
 - Run `bench --site <site> install-app <app-name>` only when the app is absent.
 - If first-time installation needs Node.js, load NVM when present and add `$HOME/.local/bin` before validating `node` inside that branch only.
 - Run `bench --site <site> migrate`, optionally `bench build --app <app-name>`, then `bench restart`.
-- Finish with an HTTPS health check and let failure fail the workflow.
+- Finish with an HTTPS health check and let failure fail the workflow. For Frappe, check `/api/method/frappe.ping` and require `message=pong` rather than only a successful homepage response.
 - Do not add frontend deployment steps unless explicitly requested.
+
+## Building The Paired Development Workflow
+
+- When adding `deploy-development.yml` alongside an existing production workflow, copy the production file rather than writing a fresh workflow, then change only the environment name, concurrency group, branch trigger, `if: github.ref` guard, credential prefix, and user-facing message strings.
+- Verify the result with `diff` against the production workflow and confirm every difference is an intentional dev/prod rename. Watch for silent damage while editing: dropping the dot in `$HOME/.nvm/nvm.sh`, and changing a glob comparison `== https://*` into a regex match `=~ https://*`.
+- Derive the development host, site, bench directory, Python version, and whether the app is already installed by checking the server directly rather than assuming them; confirm the SSH key authenticates before wiring CI.
+- Create the development environment's credentials even when the current server is the one being used for development. Give the new workflow a separate credential prefix so production and development never share a value.
+- Require the development site and public URL explicitly instead of defaulting them, so the workflow fails loudly before any SSH when the environment is unconfigured.
+- A promotion helper only triggers CI when the promoted commit is new. If the target branch already equals `HEAD`, the push is a no-op; trigger a manual run with `gh workflow run <workflow>.yml --ref <branch>` and confirm the run reaches the health check.
 
 ## GitHub Actions Deployment
 
@@ -114,19 +123,38 @@ Use this skill for the Frappe-specific lifecycle inside GitHub Actions developme
 
 - `apps/masar/sync.sh` is a legacy backend-only deployment path; do not extend it or include `masarnext` in it.
 
+## Environment-Scoped Credentials
+
+- Store each environment's credentials as **environment-scoped** secrets and variables, not repository-scoped. `gh secret set <NAME> --env <environment>` and `gh variable set <NAME> --env <environment>`; list and delete with the same `--env` flag.
+- Repository-scoped secrets are readable by every workflow in the repository regardless of its declared `environment`. A workflow declaring `environment: production` can still read a development secret. Environment scope is what prevents a production deployment from receiving development credentials.
+- Migrate by copying each value into the target environment first, verifying a deployment run succeeds against the environment-scoped copy, and only then deleting the repository-scoped duplicate. Delete the duplicate last so the repository is never left with no copy of a working credential.
+- GitHub secrets are write-only and cannot be read back through the API. Migrating a private key requires the original key material from the operator. Never substitute another environment's key or guess a value; fail and ask instead. Upload key material by piping a local file, never by echoing or printing it.
+- Keep production credentials in the `production` environment only, and development credentials in `development` only. Never give both environments a fallback to the other's variables.
+
+### Plan-gated protection rules
+
+- Environment protection rules are billing-plan dependent. On a plan without them, required reviewers, wait timers, and custom deployment branch policies fail with HTTP 422 stating the plan does not support the rule, and branch-policy creation returns 404.
+- Do not claim an environment is protected when the rule was rejected. Verify with `gh api repos/<owner>/<repo>/environments` and check that `protection_rules` is non-empty.
+- When protection rules are unavailable, keep branch restrictions in the workflow with `if: github.ref == 'refs/heads/<branch>'`, validate configuration at the start of the job so missing credentials fail before any SSH or rsync, and tell the user which platform-level gates are missing rather than implying the environment is protected.
+
 ## Sync Dating-Specific Notes
 
 - App repository: `apps/sync_dating/`, GitHub repository: `lubshad/sync-dating`; its promotion helper uses the existing `upstream` remote rather than adding or renaming `origin`.
-- Production host/site: `sync-backend.coreaxissolutions.in`; Bench: `/home/frappe/frappe-bench`; SSH user: `frappe`.
+- The current host `sync-backend.coreaxissolutions.in` is the **development** target, not production. Bench: `/home/frappe/frappe-bench`; SSH user: `frappe`; SSH key: the local bench-root `personal` key, shared with other apps and uploaded to GitHub through a pipe.
+- Development uses the `development` environment with `FRAPPE_DEV_*` credentials and the `development` branch. When a real production host is provisioned, `FRAPPE_*` must be repointed at it inside the `production` environment, and `FRAPPE_DEV_*` must stay on the current host.
+- `deploy-production.yml` deliberately has no host or site fallbacks. Do not reintroduce them: a hardcoded fallback to the development host would let a production promotion deploy to development silently. Production `FRAPPE_SITE` and `FRAPPE_PUBLIC_URL` are required at validation time.
 - The user has explicitly enabled asset builds: set the repository variable `FRAPPE_RUN_BUILD` to `true` and keep this app's workflow fallback at `true`. Run `bench build --app sync_dating` after migration and before restart, loading NVM when present. An explicit `false` variable may disable the build; do not silently revert the default to `false`.
 - Keep this build default specific to Sync Dating; other apps retain their configured build policy.
 - Verify public HTTPS using `/api/method/frappe.ping` and require `message=pong`, not a successful homepage response.
+- Both workflows keep identical hardening; only the environment name, concurrency group, branch guard, credential prefix, and message strings differ. When changing one, diff against the other and confirm every difference is an intended dev/prod rename.
+- `./deploy` only triggers CI when the promoted commit is new. When `development` already equals `HEAD`, the push is a no-op; trigger the run with `gh workflow run deploy-development.yml --ref development` instead.
 
 ## Xealth-Specific Notes
 
 - Xealth uses `./deploy` for development (`backend-dev.xealth.ca`) and `./deploy --prod` for production (`backend.xealth.ca`); `goproduction` is renamed to `deploy`, and `--dev` is not supported.
 - Development repository variables: `XEALTH_DEV_DEPLOY_HOST`, `XEALTH_DEV_DEPLOY_USER`, optional `XEALTH_DEV_DEPLOY_PORT` (22), `XEALTH_DEV_BENCH_DIR`, `XEALTH_DEV_SITE`, and absolute HTTPS `XEALTH_DEV_PUBLIC_URL`. Its separate SSH key secret is `XEALTH_DEV_DEPLOY_KEY`.
 - Keep existing production `XEALTH_DEPLOY_HOST`, `XEALTH_DEPLOY_USER`, `XEALTH_DEPLOY_KEY`, and optional `XEALTH_DEPLOY_PORT` secrets unchanged. Do not guess a development key or reuse production credentials without verifying authorization; upload private key material securely without printing or committing it.
+- Move both environments' credentials to environment scope and leave `XEALTH_DEPLOY_*` pointing only at the `production` environment.
 - Development health verification uses `/api/method/frappe.ping` and requires `message=pong`. Servers/sites are provisioned separately; the promotion helper must not SSH or provision them.
 
 - `apps/xealth/setup_server.sh` is a local server-provisioning wrapper, not just an app deploy script.
@@ -138,6 +166,15 @@ Use this skill for the Frappe-specific lifecycle inside GitHub Actions developme
 - Xealth setup must ensure `/home/frappe/frappe-bench/config/supervisor.conf` is linked into `/etc/supervisor/conf.d/frappe-bench.conf` before `supervisorctl reread/update`; otherwise Bench Redis and worker programs are not loaded even when `supervisor` itself is active.
 - Keep reruns idempotent: if `/home/frappe/frappe-bench/apps/xealth` already exists, skip app creation but still check package/site installation status. For future deploy/setup actions, add remote existence or status checks before mutating server state.
 
+## Masar and MCAL-Specific Notes
+
+- `apps/masar/` is a dual-environment app using the `upstream` remote: development deploys from the `development` branch and production from the `production` branch.
+- Masar development currently reads `MASAR_BACKEND_SSH_*` and `MASAR_BACKEND_BENCH_DIR`/`RUN_BUILD`, which have no environment marker, while production reads `MASAR_BACKEND_PROD_*`. The missing `DEV` suffix in the development names is an inconsistency: add `MASAR_BACKEND_DEV_*` when normalizing so dev and prod names are visibly distinct, and keep the production `MASAR_BACKEND_PROD_*` names working throughout the migration.
+- Masar development hardcodes `https://masarbackend.conceptiqs.com` in the workflow `environment.url`. Move it to a variable so the deployed target is configuration, not code.
+- `apps/lms_custom/` deploys through the reusable `deploy-mcal-reusable.yml`, parameterized by an `inputs.target` of `development` or `production`. Its environments are named `development-mcal` and `production-mcal`; keep the `-mcal` suffix when normalizing to avoid colliding with another app's environments in the same repository.
+- `deploy-mcal-reusable.yml` uses one shared `MCAL_SSH_PRIVATE_KEY` and `MCAL_SSH_USER` for both targets, and hardcodes the development host, site, bench directory, and public URL inline with a conditional fallback to `MCAL_PROD_*`. Separate the development credentials from the production ones and move all host values into environment-scoped variables before treating the two targets as isolated.
+- When `inputs.target` selects a target, validate that the resolved environment and branch match the target before any SSH or rsync step, so a mismatched dispatch fails before contacting a host.
+
 ## Verification
 
 - Validate workflow and promotion scripts without pushing `production` or contacting the production host as routine verification.
@@ -145,5 +182,8 @@ Use this skill for the Frappe-specific lifecycle inside GitHub Actions developme
 - Verify application package state, site installation, migrations, worker services, and nginx status.
 - Verify the target site responds through its intended host and HTTPS configuration.
 - Parse or lint GitHub workflow YAML and verify every secret and variable is documented.
+- Confirm every environment's credentials are environment-scoped, and confirm no environment still depends on a repository-scoped secret or variable.
+- Confirm the environment's `protection_rules` are actually populated; when plan-gated rules were rejected, report the missing gate instead of claiming protection.
+- Diff a paired development and production workflow and confirm every difference is an intended rename rather than an accidental edit.
 - Confirm no private-key files are tracked or included by rsync.
 - Confirm no updated guidance recommends creating or using `sync.sh` as the standard production path.

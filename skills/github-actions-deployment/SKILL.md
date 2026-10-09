@@ -26,8 +26,12 @@ Use this skill when creating or updating GitHub Actions workflows that build, re
 
 - When explicitly requested, use `./deploy` for `development` with `development-backup`, and `./deploy --prod` for `production` with `production-backup`. Xealth follows this contract. Reject unknown flags rather than silently selecting a target.
 - Provide distinct development and production workflows, GitHub environments, SSH configuration, public URLs, and non-cancelling concurrency groups. Manual dispatch must validate the matching deployment ref before checkout or SSH.
+- Scope each environment's credentials to that environment with `gh secret set <NAME> --env <environment>` and `gh variable set <NAME> --env <environment>`. Repository-scoped secrets are readable by every workflow regardless of its declared `environment`, so environment scope is what actually isolates the targets. Copy into the environment, verify a successful run, then delete the repository-scoped duplicate.
+- Secrets are write-only through the API. Migrating a private key needs fresh key material from the operator; never substitute another environment's key or read a value back. Upload key material by piping a file rather than echoing it.
+- Environment protection rules are billing-plan gated. Required reviewers and wait timers fail with HTTP 422 and custom branch policies fail with 404 on unsupported plans; check `protection_rules` is populated before describing an environment as protected.
+- Never give a deployment workflow a hardcoded host, site, or public URL fallback that belongs to another environment. Require the variable so a misconfigured target fails at validation before contacting any host.
 - Require a clean named source branch and reject both deployment branches and both backups as sources. Back up the selected target's previous OID before promotion, using explicit expected-OID force-with-lease protection for each ref update.
-- Use repository variables for non-sensitive development configuration and a separate SSH-key secret. Inspect existing GitHub entries before updating; do not overwrite unrelated production configuration or expose private key values.
+- Store non-sensitive configuration and the separate SSH-key secret at environment scope alongside the deploy target. Inspect existing GitHub entries before updating; do not overwrite unrelated production configuration or expose private key values.
 - The Frappe `reference/frappe-deploy` implements this two-environment interface. Existing production-only apps and other target modes retain their contracts unless explicitly migrated; the legacy defaults below describe those apps.
 
 - Existing production-only helpers default to promoting the source branch to `production`; the dual-environment Frappe reference instead defaults to `development` and requires `--prod` for production.
@@ -53,7 +57,7 @@ Use this skill when creating or updating GitHub Actions workflows that build, re
 
 ## SSH Deploy Rules
 
-- Keep the private SSH key in GitHub Secrets. Prefer repository or environment variables for non-sensitive values such as SSH host, SSH user, public URL, and optional port; use secrets for those values only when the deployment contract treats infrastructure metadata as confidential.
+- Keep the private SSH key in GitHub Secrets, scoped to the deployment's environment. Prefer environment variables for non-sensitive values such as SSH host, SSH user, public URL, and optional port; use secrets for those values only when the deployment contract treats infrastructure metadata as confidential.
 - Keep private keys scoped to only the validation and SSH setup steps; do not expose them as job-wide environment variables
 - Write the private key to a temporary file in the runner and lock its permissions
 - Seed `known_hosts` with `ssh-keyscan` before `ssh` or `rsync`

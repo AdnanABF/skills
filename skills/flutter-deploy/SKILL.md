@@ -1,6 +1,6 @@
 ---
 name: flutter-deploy
-description: Use when setting up a Flutter production-promotion script, version-increment script, or branch release workflow.
+description: Use when setting up or executing Flutter development or production branch promotion, version-increment scripts, or branch release workflows.
 ---
 
 # Flutter Branch Promotion And Version Increment
@@ -18,12 +18,12 @@ deployment branch such as `production`.
 - Xealth Admin development deploys web using `main_dev.dart`, `backend-dev.xealth.ca`, and `adminpanel-dev.xealth.ca`, and also publishes Android to Play internal testing through Fastlane lane `internaltest`; retain production Android/Windows workflows.
 - Xealth Employee development builds `main_dev.dart` and invokes Fastlane lane `internaltest` to upload to Google Play `internal` with the existing package/signing identity. Production builds `main_prod.dart` and retains its `azhar` merge-back. Both Play tracks share concurrency because they edit the same application; version codes must exceed all prior uploads. For both Xealth Flutter apps, internal testing runs on `development`, not a separate `internaltest` branch or deploy flag.
 - Keep the branch helper `deploy` separate from an existing local build/sync utility `deploy.sh`.
+- Both Xealth apps also trigger iOS Xcode Cloud from the selected deployment branch. Read `flutter-ios-release.md`; map development to `main_dev.dart` and production to `main_prod.dart` through the matching workflow environment variable. No iOS Fastlane lane or GitHub iOS build is required.
 - The production-only conventions and reference below remain for apps not explicitly migrated. Current dual-environment examples are `flutter_apps/xealth_admin/deploy` and `flutter_apps/xealth_employee/deploy`; do not silently change other apps' release interfaces.
 
 - Keep `deploy` and `version_increment.sh` in the Flutter repository root.
 - Existing production-only helpers target `production` by default. Existing arguments such as `build` and `patch` select version-bump modes, not branches. Explicitly migrated dual-environment apps follow the contract above instead.
-- Planned target-selection interface: `./deploy` uses `production` with `production-backup`; `./deploy --internaltest` will use `internaltest` with `internaltest-backup`. Keep target selection separate from version-bump arguments such as `build` and `patch`.
-- The `--internaltest` flag is not supported by current reference scripts. Implement it only when requested, with a matching workflow and target-specific safety guards; back up the selected target's previous ref and preserve the default production behavior.
+- Do not introduce a planned `--internaltest` interface or separate internaltest branch into Xealth. Its development branch already owns internal testing. For other apps, introduce new target-selection interfaces only when explicitly requested, preserving their documented defaults and backup safety.
 - Start both scripts with `#!/bin/bash` and `set -euo pipefail`.
 - Make both scripts executable.
 - Require promotion from `main` unless the repository documents another source branch.
@@ -73,6 +73,13 @@ The reference promotion script accepts:
   rewrites release refs, and may deploy production.
 - If branch protection rejects lease-protected promotion, update the repository's
   release policy instead of weakening the script to unrestricted force pushes.
+
+### Authorized release execution and confirmation
+
+- When asked to commit, push main, and deploy development, review the diff and preserve unrelated user work; commit the scoped fixes, push main, then run the existing `./deploy` without `--prod`. The helper owns its version bump/release commit and development backup. Do not bump manually and then unknowingly bump again.
+- Verify remote main and the selected deployment branch both reference the intended release commit, the backup contains the previous target commit, and the worktree is clean. Confirm production refs were unchanged for a development-only request.
+- Check every pipeline triggered by that promotion independently: for Xealth, Xcode Cloud archive and TestFlight; Android internal testing; and Admin's development web sync/verification. Git push or a script's completion message only confirms promotion, not deployment success.
+- Wait for terminal results when the user requests confirmation. Report exact release version, commit, Apple build number and distribution outcome, plus GitHub run results/links. If another blocker appears, diagnose it from logs, apply a targeted fix, and redeploy through the helper rather than silently declaring success or changing production.
 
 ## Verification
 

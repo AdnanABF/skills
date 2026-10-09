@@ -129,10 +129,19 @@ All Frappe API calls follow: `{MASAR_API_BASE_URL}/api/method/masar.api.<method_
 |-----------|----------|------|
 | Backend | `apps/xealth/` | Frappe app |
 | Admin frontend | `flutter_apps/xealth_admin/` | Flutter shift management admin panel |
+| Employee frontend | `flutter_apps/xealth_employee/` | Flutter employee self-service app (web + Android/iOS) |
 | Voice assistant | `pipecat_bots/xealth-voice-assistant/` | Pipecat realtime voice bot (web and Twilio telephony); GitHub: `pentaverse-sa/xealth-voice-assistant` |
 | Frappe site | `sites/xealth.localhost` | Local Xealth target site |
 | API base URL (dev) | `http://xealth.localhost:8000` | Local Frappe API host |
 | Admin local URL | `http://xealth.localhost:8085` | Required URL for local runs, tests, and Playwright |
+| Employee local URL | `http://xealth.localhost:8086` | Required URL for local runs, tests, and Playwright |
+
+### Xealth Realtime Hosts
+
+- Both Xealth frontends connect Socket.IO on the frontend's own origin, not the API host. Each frontend vhost reverse-proxies `/socket.io` to the Frappe realtime server; add it with `.agents/scripts/add_socketio_proxy.sh --frontend <frontend-host> --backend <backend-host>`.
+- Development: API `backend-dev.xealth.ca`; admin sockets `adminpanel-dev.xealth.ca`; employee sockets `employee-dev.xealth.ca`.
+- Production: API `backend.xealth.ca`; admin sockets `adminpanel.xealth.ca`; employee sockets `employee.xealth.ca`.
+- The socket namespace stays the Frappe API host (`/backend-dev.xealth.ca` or `/backend.xealth.ca`) because the proxy forwards `X-Frappe-Site-Name` as the backend host.
 
 ## Sync Project
 
@@ -142,15 +151,23 @@ All Frappe API calls follow: `{MASAR_API_BASE_URL}/api/method/masar.api.<method_
 | Mobile app | `flutter_apps/syncapp/` | Blank Android/iOS Flutter app (`com.sync.syncapp`); backend not connected yet |
 | Web frontend | `next_apps/sync-dating/` | Next.js frontend directory containing Concept 1 and admin |
 | Admin frontend | `next_apps/sync-dating/admin/` | Separate admin UI at `http://sync-dating.localhost:3006` |
+| Admin host (dev) | `https://sync-admin.coreaxissolutions.in` | Existing **development** preview, not production; SSH `next@sync-concept-1.coreaxissolutions.in`, directory `$HOME/sync-admin/release`, PM2 `sync-admin`, loopback port `3102` |
+| Admin deploy (dev) | `next_apps/sync-dating/admin/.github/workflows/deploy-development.yml` | `./deploy` promotes to `development` with `development-backup`; credentials are `SYNC_ADMIN_DEV_*` inside the `development` environment |
+| Admin deploy (prod) | `next_apps/sync-dating/admin/.github/workflows/deploy-production.yml` | `./deploy --prod` promotes to `production`; **no production target is provisioned** and its `SYNC_ADMIN_*` environment credentials remain unconfigured |
 | Frappe site | `sites/sync-dating.localhost` | Local Sync Dating target site |
 | API base URL (dev) | `http://sync-dating.localhost:8000` | Local Frappe API host |
+| Backend host (dev) | `sync-backend.coreaxissolutions.in` | Current **development** host and site; Bench `/home/frappe/frappe-bench`, SSH user `frappe` |
+| Backend deploy (dev) | `apps/sync_dating/.github/workflows/deploy-development.yml` | GitHub Actions deploys the `development` branch promoted by `apps/sync_dating/deploy`, using the `development` environment and `FRAPPE_DEV_*` credentials |
+| Backend deploy (prod) | `apps/sync_dating/.github/workflows/deploy-production.yml` | Deployed by the `production` branch and the `production` environment; **no production host exists yet** |
 | Concept 1 PWA | `next_apps/sync-dating/concept-1/` | Static installable prototype at `http://sync-dating.localhost:3001`; required URL for local runs, tests, and Playwright |
 
 ### Sync Local Frontend
 
 - Run each Next.js development server with hostname `sync-dating.localhost`, not `localhost` or `127.0.0.1`, so future Frappe CORS, session cookies, and Socket.IO share the site hostname.
+- `sync-backend.coreaxissolutions.in` is the development target, not production. When a production host is provisioned, keep `FRAPPE_DEV_*` on this host and repoint `FRAPPE_*` inside the `production` environment; never let a production workflow fall back to the development host.
 - Concept 1 is the only Sync concept in use; reserve port `3001` for it.
 - Reserve port `3006` for the separate Sync Dating admin UI.
+- The existing hosted admin URL `sync-admin.coreaxissolutions.in` is development; do not add a `-dev` hostname or a second server instance for this setup. Its previous `production` deployment label was historical, not a production-host designation. Keep future production credentials separate, with no fallback to this development server.
 
 ## Zeronic Project
 

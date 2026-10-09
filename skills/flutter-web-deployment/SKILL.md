@@ -84,6 +84,26 @@ The nginx config must include:
 - Hidden-file denial with `location ~ /\.`.
 - App-specific access and error logs.
 
+### Frontend-origin Socket.IO
+
+When the browser frontend is served from a domain different from the Frappe
+backend, the realtime client must connect on the frontend's own origin and the
+frontend vhost must reverse-proxy `/socket.io` to the Frappe realtime server.
+This keeps the browser same-origin and avoids the backend's cross-origin
+rejection.
+
+- Point the app's `socketBaseUrl` at the frontend host while `apiBaseUrl` and the
+  Frappe site namespace stay on the backend host.
+- Add the managed proxy with
+  `.agents/scripts/add_socketio_proxy.sh --frontend <frontend-host> --backend <backend-host> [--ssh-key PATH]`.
+  It sets `Host`, `Origin`, and `X-Frappe-Site-Name` to the backend host, backs up
+  the vhost, runs `nginx -t`, and reloads; `--dry-run`, `--check`, and `--remove`
+  are supported. The helper
+  `.agents/scripts/socketio_proxy_config.py` does the in-place edit.
+- New vhost scripts for these apps should emit the same
+  `# >>> frappe socket.io proxy (managed) >>>` markers so the helper stays
+  idempotent and existing vhosts remain updatable.
+
 ## Certbot Setup Script
 
 For `setup_certbot.sh`:
@@ -106,6 +126,7 @@ For `setup_certbot.sh`:
 - Add a development workflow building `lib/main_dev.dart`, while keeping production on `lib/main_prod.dart`. Verify the development app configuration uses development API, site and socket domains; a differently named entrypoint alone does not ensure isolation.
 - Use distinct target environments, host/path/public-URL variables, and concurrency groups. Require the matching branch for manual retries. Keep private keys step-scoped and clean them up even on failure.
 - Xealth Admin development uses `backend-dev.xealth.ca` for SSH/API, `adminpanel-dev.xealth.ca` for web/sockets, `root`, and `/var/www/xealth_admin` on the separate dev host. GitHub variables are `XEALTH_ADMIN_DEV_SSH_HOST`, `XEALTH_ADMIN_DEV_SSH_USER`, optional `XEALTH_ADMIN_DEV_SSH_PORT`, `XEALTH_ADMIN_DEV_REMOTE_PATH`, and `XEALTH_ADMIN_DEV_PUBLIC_URL`; its SSH secret is `XEALTH_ADMIN_DEV_SSH_PRIVATE_KEY`.
+- Xealth Employee follows the same API/socket split: API on `backend(-dev).xealth.ca`, realtime on `employee(-dev).xealth.ca` (frontend origin, proxied via `/socket.io`). Its frontend hosts are `employee-dev.xealth.ca` and `employee.xealth.ca`, with web root `/var/www/xealth_employee`.
 - Preserve existing production workflows and local script defaults unless asked to migrate them. Verify remote artifacts plus public HTTPS; DNS, nginx and TLS provisioning remain separate.
 
 For Flutter web deploy workflows:

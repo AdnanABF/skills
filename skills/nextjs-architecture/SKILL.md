@@ -56,6 +56,15 @@ API routes in `src/app/api/` mirror feature boundaries:
 - Browser clients read current credentials at dispatch time. Server clients receive credentials scoped to the incoming request; never put a user's credentials in shared mutable defaults or cross-user caches.
 - Validate backend destinations and keep third-party requests separate. Apply the shared unauthorized-response rules in the browser auth layer, not through server-side global state.
 
+## Web Token Authentication Boundary
+
+- Follow `frontend-api-client.md` for new web token auth: browser clients call same-origin route handlers, while server-only modules read request-scoped HttpOnly session/cookie credentials and call the backend. Do not send upstream API secrets through client props or browser JSON.
+- Keep credential codecs and encryption keys server-only. With encrypted cookies, use purpose-bound authenticated encryption, validate payloads and expiry, and use Secure/host-only cookies for hosted HTTPS.
+- Route handlers enforce exact configured Origin/CSRF checks for cookie-authenticated mutations, including login/logout. Reject arbitrary upstream URLs and disable credential-bearing redirects.
+- Protect each backend API independently; a layout or optimistic Proxy redirect is not sufficient. Validate current backend identity and roles before rendering protected content, including client/RSC navigation. Do not trust caller-supplied identity headers; overwrite internal headers at the server boundary.
+- Read the installed Next.js docs before implementing cookies, route handlers or Proxy conventions. On current versions, cookie/header access is asynchronous. Keep route adapters thin, authenticated fetches uncached and runtime secrets out of `NEXT_PUBLIC_*`.
+- Existing Masar direct-token helper names below describe that application's current boundary. A new application should not copy browser token persistence solely to match those names; use the BFF design and preserve upstream authentication mode/metadata.
+
 ## Shared Data (`src/data/`)
 
 - Lookup data fetchers (countries, genders, etc.) that are used across multiple features live here.
@@ -73,3 +82,9 @@ API routes in `src/app/api/` mirror feature boundaries:
 8. **API route pattern.** Every API route follows the same structure: parse request → extract auth → call feature server function → return JSON response. Keep routes thin.
 9. **Reuse shared empty states.** When a screen needs a standard no-data view, use `src/components/ui/EmptyState.tsx` instead of re-creating feature-local empty-state markup.
 10. **Paginate listing pages.** Any listing/index page like coaches, athletes, clubs, academies, events, or programs must follow `nextjs-listing-screens.md`: fetch the first page only and expose additional results through a Load more button.
+
+## Verification
+
+- Run lint, type analysis/build and authentication tests against the installed Next.js version.
+- Verify protected document/RSC navigation and each feature API reject invalid/revoked credentials, with no secret leakage or cross-user response caching.
+- Verify cookie flags, encryption/expiry, exact-Origin rejection, backend token headers and device revocation on logout.

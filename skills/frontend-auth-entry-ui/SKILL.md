@@ -39,6 +39,12 @@ Desktop, tablet-wide, and browser-hosted admin auth screens must use a two-secti
 ## Related Skills
 
 - `frontend-forms.md` for validation, input behavior, submit state, and dummy-data rules.
+- `frontend-api-client.md` for web credential security: new browser token login uses a same-origin BFF with server-controlled credentials or authenticated-encrypted HttpOnly cookies, not browser-readable API-secret storage. Keep login/logout CSRF protection and server-side authorization separate from form presentation.
 - `frontend-country-code-picker.md` for phone login country picker UI.
 - `frontend-device-layout.md` for desktop/tablet/mobile behavior.
 - Platform-specific auth, routing, and performance rules remain in `flutter-*` and `nextjs-*` skills.
+
+## Verification
+
+- Check desktop two-section and narrow-mobile form-focused layouts, autofocus, keyboard submission, pending and recoverable error states.
+- For web token login, verify API secrets never appear in browser-readable storage or response bodies and protected routes validate identity and access server-side.

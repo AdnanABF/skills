@@ -2,6 +2,8 @@
 
 For React/Vite or other browser apps already using native fetch, use a backend-scoped wrapper instead of introducing Axios solely for interceptors.
 
+For new web token-authentication flows, apply the shared skill's BFF credential-security rule first. Browser requests use same-origin application endpoints with cookie credentials; only the server injects upstream token headers. The direct-backend patterns below describe compatibility for existing browser clients, not the preferred storage design for new applications. Static-only React/Vite/Flutter web deployments need a server/BFF service to provide this boundary; do not pretend HttpOnly storage can be implemented entirely in client code.
+
 - In Zeronic, the wrapper is `frappeFetch` in `react_apps/zeronic/src/lib/frappe-api.ts`.
 - Feature calls provide `/api/` paths and request options. The client owns token headers; `auth: "none"` marks public requests and `auth: "session"` preserves cookie sessions.
 - Resolve and validate paths against the configured backend before reading credentials. Reject absolute/external paths and disallow redirects for token API calls.
