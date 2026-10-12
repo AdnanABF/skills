@@ -53,6 +53,7 @@ Use this skill when creating or updating GitHub Actions workflows that build, re
 - Declare the package manager and exact version in `package.json` (for example, `"packageManager": "npm@11.6.2"`) and install that version in CI before `npm ci`. The lockfile generator and CI installer must use the same package-manager version to avoid optional-dependency and lockfile compatibility failures.
 - For standalone Next.js deploys, sync only runtime artifacts such as `.next/standalone`, `.next/static`, `public/`, and the runtime launcher
 - Keep production environment values server-managed unless the user explicitly asks for a GitHub-managed env strategy
+- Distinguish successful publishing from later artifact-retention failures. If a Play upload succeeded but `actions/upload-artifact` failed on storage quota, do not rerun the old release and upload its version code again. For redundant retained artifacts, remove the upload step when that fits the release contract; otherwise resolve quota/retention separately. Validate recovery at a new release commit with a new version code and report the old run as historically failed rather than rewriting its outcome.
 - Do not copy repo `.env.production` to the server when the chosen contract is server-managed env
 
 ## SSH Deploy Rules
