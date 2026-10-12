@@ -71,6 +71,7 @@ Use this skill for the Frappe-specific lifecycle inside GitHub Actions developme
 - Run `bench --site <site> install-app <app-name>` only when the app is absent.
 - If first-time installation needs Node.js, load NVM when present and add `$HOME/.local/bin` before validating `node` inside that branch only.
 - Run `bench --site <site> migrate`, optionally `bench build --app <app-name>`, then `bench restart`.
+- Before migration, retain any required backup and migration preflight. On Frappe versions where `bench execute` evaluates `--kwargs` as Python, use Python literals (for example `--kwargs '{"fail_on_duplicates": True}'`), not JSON `true`, `false`, or `null`. Verify the installed CLI parser and validate the literal without contacting a shared site; a parsing failure is not a successful preflight.
 - Finish with an HTTPS health check and let failure fail the workflow. For Frappe, check `/api/method/frappe.ping` and require `message=pong` rather than only a successful homepage response.
 - Do not add frontend deployment steps unless explicitly requested.
 
@@ -187,3 +188,4 @@ Use this skill for the Frappe-specific lifecycle inside GitHub Actions developme
 - Diff a paired development and production workflow and confirm every difference is an intended rename rather than an accidental edit.
 - Confirm no private-key files are tracked or included by rsync.
 - Confirm no updated guidance recommends creating or using `sync.sh` as the standard production path.
+- After fixing a failed deployment workflow, trigger a new development run at the corrected commit rather than rerunning the old commit. Verify migration, restart, and health before unblocking dependent releases. Preserve historical failed-run evidence, record the successful superseding SHA/run, and reconcile all dependent pending releases without repeating version bumps or deploying unrelated changes.
