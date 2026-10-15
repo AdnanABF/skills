@@ -368,7 +368,8 @@ if [[ "$EXECUTE" -eq 1 ]]; then
     for key in "${CONFIG_KEYS[@]}"; do
       CONFIG_ARGS+=(--key "$key")
     done
-    python3 "$SCRIPT_DIR/sync_site_config.py" validate "${CONFIG_ARGS[@]}"
+    python3 "$SCRIPT_DIR/sync_site_config.py" validate "${CONFIG_ARGS[@]}" || \
+      fail "Configuration validation failed. Repair the remote site configuration (for example a missing encryption_key), or rerun with --skip-config to keep the local configuration."
     CONFIG_DEST="$LOCAL_BACKUP_DIR/$(basename "$LATEST_CONFIG")"
     mv -f -- "$LOCAL_CONFIG" "$CONFIG_DEST"
     LOCAL_CONFIG="$CONFIG_DEST"

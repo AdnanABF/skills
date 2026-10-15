@@ -38,6 +38,10 @@ Follow these API contract rules strictly when working on Frappe-backed features.
 
 ## Client Compatibility
 
+- Return a readable title/name alongside every linked record's canonical `name`/ID in list, detail, create/update, and selection/search responses. Forms and selectors must display the readable text as the primary label; keep IDs for persistence, joins, API payloads, and optional secondary disambiguation only.
+- Use the target DocType's `title_field` (for example Guardian `guardian_name`), not an autoname/series ID, as its display name. Configure `show_title_field_in_link` when appropriate for Desk selectors. Do not rename documents or replace stored link IDs with titles.
+- Frappe `search_link` can return `label == value` when `show_title_field_in_link` is disabled even though `description` includes the readable title. Consumers must not blindly prefer that ID-valued label over readable description/title text. Preserve the selected label in forms and resolve the title for existing saved links as well.
+- Respect field/document permissions when resolving titles. If no readable title is available, use a safe fallback without exposing restricted data or clearing the stored link.
 - Assume Next.js and Flutter clients should not reconstruct backend file URLs on their own.
 - Avoid mixing relative paths, absolute URLs, and signed URLs for the same response field across endpoints.
 - Do not leave app asset paths as relative `/assets/...` values in API responses; normalize them to absolute URLs before returning.
@@ -62,6 +66,7 @@ Follow these API contract rules strictly when working on Frappe-backed features.
 
 ## Verification
 
+- Verify a series-named linked record shows its readable name in search results, immediately after selection, and after reopening the edit form, while saving still submits its original ID. Cover duplicate titles and unavailable/restricted titles.
 - Verify authenticated and unauthorized responses do not expose fields beyond the caller's permissions.
 - Verify list, detail, create, and update responses use compatible field names and normalized asset URLs.
 - Verify additive changes preserve existing response fields and types for active clients.

@@ -61,6 +61,29 @@ class ConfigSyncTests(unittest.TestCase):
 				self.assertFalse(local.exists())
 				self.assertNotIn("broken", result.stderr)
 
+	def test_failures_name_the_key_without_values(self) -> None:
+		cases = [
+			({"db_password": "local-only"}, [], "Required remote configuration key is missing: encryption_key"),
+			({"encryption_key": KEY, "custom_token": "sensitive-value"}, ["custom_token", "db_password"], "Protected local configuration key cannot be synced: db_password"),
+			({"encryption_key": "not-a-fernet-key"}, [], "Remote encryption_key must be a valid Fernet key"),
+		]
+		with tempfile.TemporaryDirectory() as directory:
+			root = Path(directory)
+			remote = root / "remote.json"
+			local = root / "site_config.json"
+			local.write_text('{"db_name": "local"}')
+			for remote_config, keys, expected in cases:
+				remote.write_text(json.dumps(remote_config))
+				args = ["python3", str(HELPER), "validate", "--remote", str(remote), "--local", str(local)]
+				for key in keys:
+					args += ["--key", key]
+				result = subprocess.run(args, capture_output=True, text=True)
+				self.assertEqual(result.returncode, 1, result.stderr)
+				self.assertIn("Configuration sync failed:", result.stderr)
+				self.assertIn(expected, result.stderr)
+				self.assertNotIn("sensitive-value", result.stderr)
+				self.assertNotIn(KEY, result.stderr)
+
 	def test_dry_run_has_no_side_effects(self) -> None:
 		with tempfile.TemporaryDirectory() as directory:
 			root = Path(directory)

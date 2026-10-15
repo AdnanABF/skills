@@ -31,6 +31,7 @@ Apply to every create/edit form, onboarding flow, profile form, filter form with
 
 ## Selection Components
 
+- Show readable names/titles as the primary text for linked records in results and selected form fields, never raw internal IDs when readable text exists. Preserve the selected title and resolve titles for prefilled/saved links; keep canonical IDs in draft values and submission payloads. IDs may be secondary text for duplicate-name disambiguation. Use a safe fallback only when no permitted title is available.
 - Do not use simple dropdowns for network-bound items, dynamic/searchable lists, or option sets with more than 5 items.
 - Use the platform's searchable selector, picker screen, or dialog pattern instead.
 - Selection components must preserve typed search/filter state while results load.

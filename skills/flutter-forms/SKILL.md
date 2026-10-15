@@ -18,6 +18,7 @@ Follow these Flutter implementation rules for forms. Read `frontend-forms.md` fi
 
 ## Selection Components
 
+- Shared Frappe link fields must retain the readable label returned by the picker separately from the stored ID, and resolve labels for initially loaded or externally changed values. Prefer an explicit readable label, then a readable search description/title when Frappe returns `label == value`, then the ID only as an unavailable-title fallback. Guard async resolution against stale values and disposal; never submit the display title in place of the link ID.
 - Use `DropdownButtonFormField` or the platform's default inline dropdown for Frappe `Select` fields whose options come from static newline-separated metadata.
 - Do not use `DropdownButton`/dropdowns for network-bound, dynamic, searchable, or non-static option sets.
 - Mobile: navigate to a dedicated search/selection screen and return the selected value.

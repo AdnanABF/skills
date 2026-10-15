@@ -45,6 +45,7 @@ and uses `.agents/scripts/sync_site_config.py` for validation and merging.
 - Local database settings, Redis/socket endpoints, hostname, developer mode, and scheduler controls are protected, even when absent locally. The helper owns the protected-key list.
 - Unselected settings remain local; `common_site_config.json` is not synced.
 - Missing matching configuration, invalid JSON, missing selected keys, or an invalid encryption key abort before restore.
+- Validation failures name the offending key or location (for example `Required remote configuration key is missing: encryption_key`) and never a configuration value; unexpected JSON/OS errors keep the generic message. The sync script then hints to repair the remote configuration or rerun with `--skip-config`.
 - Downloaded configuration is private (`0600`). A timestamped `site_config.pre-sync-*.json` backup is kept beside the local configuration before database restore; these recovery copies are not pruned automatically.
 - The merge is atomic and happens after database restore, before migration. Output lists key names, never configuration values.
 - `--skip-backup` still requires configuration paired with the selected database backup; dry-run performs no remote reads or writes.

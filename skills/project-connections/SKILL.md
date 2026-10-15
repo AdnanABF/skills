@@ -31,7 +31,8 @@ Reference map for all apps, sites, and their connections in this bench.
 | Masar web | `http://masar.localhost:3000` | `./run_masar_next.sh` |
 | Sync Dating concept 1 | `http://sync-dating.localhost:3001` | Run `npm run dev` in `next_apps/sync-dating/concept-1/` |
 | Sync Dating admin | `http://sync-dating.localhost:3006` | Run `npm run dev` in `next_apps/sync-dating/admin/` |
-| Usafe Safety admin | `http://usafe-safety.localhost:3004` | Run `npm run dev` in `react_apps/UsafeSafety/` |
+| Usafe Safety admin | `http://usafe-safety.localhost:3004` | Run `./run.sh` in `react_apps/usafe_admin/` |
+| Usafe Safety super admin | `http://usafe-safety.localhost:3007` | Run `./run.sh` in `react_apps/usafe_super_admin/` |
 | Omor admin | `http://omor.localhost:3005` | Run Flutter web with `--web-hostname omor.localhost --web-port 3005` |
 | Masar admin | `http://masar.localhost:8001` | `./run_masar_admin.sh` |
 | Zeronic web | `http://zeronic.localhost:8080` | Run `npm run dev` in `react_apps/zeronic/` |
@@ -148,7 +149,8 @@ All Frappe API calls follow: `{MASAR_API_BASE_URL}/api/method/masar.api.<method_
 | Component | Location | Role |
 |-----------|----------|------|
 | Backend | `apps/sync_dating/` | Frappe app for Sync Dating customizations and APIs |
-| Mobile app | `flutter_apps/syncapp/` | Blank Android/iOS Flutter app (`com.sync.syncapp`); backend not connected yet |
+| Calling backend | `apps/agora_integration/` | Reusable Agora user-to-user audio/video calling Frappe app; installed only on `sync-dating.localhost`; requires `flutter_utils`; `sync_dating` requires it and owns the HTTP wrappers |
+| Mobile app | `flutter_apps/syncapp/` | Android/iOS Flutter app (`com.sync.syncapp`) with a dedicated `features/calling/` Agora RTC module |
 | Web frontend | `next_apps/sync-dating/` | Next.js frontend directory containing Concept 1 and admin |
 | Admin frontend | `next_apps/sync-dating/admin/` | Separate admin UI at `http://sync-dating.localhost:3006` |
 | Admin host (dev) | `https://sync-admin.coreaxissolutions.in` | Existing **development** preview, not production; SSH `next@sync-concept-1.coreaxissolutions.in`, directory `$HOME/sync-admin/release`, PM2 `sync-admin`, loopback port `3102` |
@@ -160,6 +162,14 @@ All Frappe API calls follow: `{MASAR_API_BASE_URL}/api/method/masar.api.<method_
 | Backend deploy (dev) | `apps/sync_dating/.github/workflows/deploy-development.yml` | GitHub Actions deploys the `development` branch promoted by `apps/sync_dating/deploy`, using the `development` environment and `FRAPPE_DEV_*` credentials |
 | Backend deploy (prod) | `apps/sync_dating/.github/workflows/deploy-production.yml` | Deployed by the `production` branch and the `production` environment; **no production host exists yet** |
 | Concept 1 PWA | `next_apps/sync-dating/concept-1/` | Static installable prototype at `http://sync-dating.localhost:3001`; required URL for local runs, tests, and Playwright |
+
+### Sync Agora Calling
+
+- `apps/agora_integration/` is a reusable Agora calling app, currently installed only on the `sync-dating.localhost` site. Its dependency is `flutter_utils`; `sync_dating` declares `required_apps = ["flutter_utils", "agora_integration"]` and provides the HTTP wrappers in `apps/sync_dating/sync_dating/api/calls.py`.
+- DocTypes: `Agora Settings` (single; `enabled`, App ID, Password App Certificate, and token/ring/connect/heartbeat timeouts), plus `Agora Call Session`, `Agora Call Participant`, and `Agora Call Event`. A `* * * * *` scheduler task `agora_integration.tasks.expire_calls` expires stale active sessions.
+- Store App ID and App Certificate only in `Agora Settings`; never place the certificate in git, Flutter, chat, notification payloads, or logs.
+- Flutter calling lives in `flutter_apps/syncapp/lib/features/calling/` (`rtc_service.dart`, `call_signaling.dart`, `calling_scope.dart`). Realtime invitations use standard FCM plus Socket.IO; native handshake authenticates with `Authorization: FlutterDevice <key>:<secret>` against the site namespace `/sync-dating.localhost`, using `SYNC_API_BASE_URL` / `SYNC_SOCKET_BASE_URL` overrides.
+- `sync_dating` owns persisted listener availability, user blocking, and member/approved-listener policy; `agora_integration` owns settings, session lifecycle, tokens, events, and notifications.
 
 ### Sync Local Frontend
 
@@ -186,10 +196,12 @@ All Frappe API calls follow: `{MASAR_API_BASE_URL}/api/method/masar.api.<method_
 | Component | Location | Role |
 |-----------|----------|------|
 | Backend | `apps/usafe_safety/` | Frappe app for Usafe Safety customizations and APIs |
-| Web frontend | `react_apps/UsafeSafety/` | Vite/React public Usafe Safety application |
+| Admin frontend | `react_apps/usafe_admin/` | Vite/React Usafe Safety admin application |
+| Super admin frontend | `react_apps/usafe_super_admin/` | Vite/React uSafe platform control panel for uSafe staff (mocked data, HashRouter) |
 | Frappe site | `sites/usafe-safety.localhost` | Local Usafe Safety target site |
 | API base URL (dev) | `http://usafe-safety.localhost:8000` | Set via `VITE_API_BASE_URL` in the React app's `.env.development` |
-| Admin frontend URL (dev) | `http://usafe-safety.localhost:3004` | Run with `npm run dev`; required URL for local runs, tests, and Playwright |
+| Admin frontend URL (dev) | `http://usafe-safety.localhost:3004` | Run `./run.sh` in `react_apps/usafe_admin/`; required URL for local runs, tests, and Playwright |
+| Super admin frontend URL (dev) | `http://usafe-safety.localhost:3007` | Run `./run.sh` in `react_apps/usafe_super_admin/`; required URL for local runs, tests, and Playwright |
 
 ## Environment Config
 

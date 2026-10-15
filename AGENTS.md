@@ -71,6 +71,8 @@ For any creation, update, review, API response, or frontend display of Frappe No
 
 For Pipecat self-hosting and production deployment, read `pipecat-self-hosting.md` and `github-actions-deployment.md`. The skill uses uv and systemd by default and includes Docker guidance for existing containerized bots.
 
+For creating, configuring, or reviewing project-wide scheduled PR watchers, read `project-connections.md` first, then `project-pr-watcher.md`, followed by all applicable review and deployment skills. Discover connected repositories before defining the explicit authorized review/merge/deployment scope.
+
 ## Skills
 
 ### Platform-Agnostic Frontend UI
@@ -171,6 +173,7 @@ For Pipecat self-hosting and production deployment, read `pipecat-self-hosting.m
 | Skill | When to apply |
 |-------|---------------|
 | `skill-updates.md` | Task not covered by any existing skill, or creating/updating skills in the `.agents/skills` catalog |
+| `project-pr-watcher.md` | Project-wide scheduled PR watcher discovery, review, blocker comments, protected merges, dependency-aware deployment, and durable recovery |
 
 ### Compatibility Adapters
 

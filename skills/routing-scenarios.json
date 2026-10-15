@@ -1,5 +1,9 @@
 [
   {
+    "scenario": "Project-wide scheduled PR watcher discovery, review, comment or merge, and authorized deployment",
+    "skills": ["project-connections", "project-pr-watcher", "github-actions-deployment"]
+  },
+  {
     "scenario": "React Vite shared backend client and managed-device authentication",
     "skills": ["frontend-api-client", "frappe-api-contracts", "api-parallelization"]
   },
