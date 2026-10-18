@@ -1,5 +1,13 @@
 [
   {
+    "scenario": "Set up GitHub Actions deployment for a new Flutter mobile app backed by Flutter Utils, including release gates",
+    "skills": ["project-connections", "github-actions-deployment", "frontend-ui-states", "frontend-interaction-patterns", "frontend-device-layout", "frontend-api-client", "flutter-app-release-gates", "flutter-android-release", "flutter-ios-release", "flutter-networking", "flutter-linting"]
+  },
+  {
+    "scenario": "Flutter app optional or forced update and temporary unavailability using Flutter Utils, including app resume checks",
+    "skills": ["frontend-ui-states", "frontend-interaction-patterns", "frontend-device-layout", "frontend-api-client", "flutter-app-release-gates", "flutter-networking", "flutter-state-management", "flutter-dialogs", "flutter-linting"]
+  },
+  {
     "scenario": "Project-wide scheduled PR watcher discovery, review, comment or merge, and authorized deployment",
     "skills": ["project-connections", "project-pr-watcher", "github-actions-deployment"]
   },

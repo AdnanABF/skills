@@ -112,6 +112,7 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 | `flutter-admin-branding.md` | Any Flutter admin app branding/rebranding, logo, splash, login identity, favicon/PWA metadata, or shell brand colors |
 | `flutter-web-deployment.md` | Flutter web deploy scripts, nginx setup, certbot setup, static artifact sync, and GitHub Actions workflows |
 | `flutter-utilities.md` | Auth flow plumbing, splash, webview, HTML, env |
+| `flutter-app-release-gates.md` | Flutter Utils optional/forced updates, temporary-unavailable bottom sheets, startup/resume checks; also apply during new Flutter mobile GitHub/store deployment setup |
 | `flutter-listing-screens.md` | Flutter implementation adapter for listing screens. Read `frontend-listing-screens.md` first |
 | `flutter-forms.md` | Flutter implementation adapter for forms. Read `frontend-forms.md` first |
 | `flutter-dialogs.md` | Flutter dialogs, modal route actions, focus behavior, and overlays above WebViews or platform views |

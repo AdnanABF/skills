@@ -13,6 +13,10 @@ Use this skill when configuring or explaining deployments for Flutter iOS applic
 - `flutter-utilities.md` for general app environment rules.
 - `flutter-deploy.md` when committing fixes and promoting main to development or production.
 - `github-actions-deployment.md` only if comparing CI systems.
+- `flutter-app-release-gates.md` when setting up releases for a new app backed
+  by `flutter_utils`, including GitHub or Xcode Cloud setup. Include client gates,
+  startup/resume checks, tests, and operator configuration; TestFlight upload or
+  App Store submission alone does not justify enabling a forced update.
 
 ## Entrypoints
 

@@ -12,6 +12,10 @@ Use this skill when implementing automated Play Store deployments for Flutter An
 - `flutter-utilities.md` for general app environment rules.
 - `flutter-linting.md` for pre-release verification rules.
 - `github-actions-deployment.md` for general CI/CD deployment logic.
+- `flutter-app-release-gates.md` when setting up releases for a new app backed
+  by `flutter_utils`. Include client gates, startup/resume checks, tests, and
+  operator configuration in setup; do not automatically force an unpublished
+  version on users after a successful Play upload.
 
 ## Entrypoints
 

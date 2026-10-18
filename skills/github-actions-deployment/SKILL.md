@@ -14,6 +14,28 @@ Use this skill when creating or updating GitHub Actions workflows that build, re
 - Creating branch-promotion scripts that trigger GitHub Actions deployments
 - Explaining how a GitHub Actions deployment flow should work in this repo
 
+## Flutter Mobile Release Gates During Deployment Setup
+
+- When setting up GitHub Actions builds/releases/deployment for a new Flutter
+  Android/iOS app backed by `flutter_utils`, read and apply
+  `flutter-app-release-gates.md` as part of setup, not only when update UI is
+  explicitly requested. Read the shared frontend prerequisites listed there
+  before implementing the client integration.
+- Inspect existing gates first. Implement missing startup/resume checks,
+  bottom sheets, public-client integration, and regression tests; preserve an
+  existing compliant implementation rather than creating a second one.
+- Align the logical application identifier with push registration and the
+  environment's Flutter Utils Settings. Document release versions (not build
+  numbers), per-platform store links, and the operator configuration checklist.
+- Keep development/internal-test and production API targets/policies separate.
+  A successful CI upload is not proof a store release is approved or available
+  to all users. Do not automatically raise Minimum Version, enable Force Update,
+  or toggle maintenance from CI unless explicitly authorized with a safe rollout
+  contract. Do not give a mobile build workflow backend admin credentials just
+  to configure release policy.
+- If the backend does not use `flutter_utils`, do not introduce it or unrelated
+  release infrastructure solely because this deployment skill was triggered.
+
 ## Repo Boundary Rule
 
 - Identify the actual Git repository before adding a workflow
