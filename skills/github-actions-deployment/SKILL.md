@@ -64,6 +64,7 @@ Use this skill when creating or updating GitHub Actions workflows that build, re
 - Use `concurrency` for production deploys to prevent overlapping releases
 - Use GitHub `environment` for production workflows when the deploy has a stable public URL
 - Fail fast on missing required secrets before the deploy step starts
+- Android signing normally comes from secrets. The user-authorized Masar mobile repository-signing exception in `flutter-android-release.md` instead uses tracked `android/key.properties` and `android/app/upload-keystore.jks`; only `PLAYSTORE_SERVICE_ACCOUNT_JSON` is required as an Android workflow secret. Validate signing files before building and never delete tracked signing files during credential cleanup. This exception does not authorize committing service-account JSON or other apps' credentials.
 - Set explicit least-privilege workflow permissions, normally `contents: read`
 - Set a finite job timeout
 

@@ -23,7 +23,7 @@ Use this skill when implementing automated Play Store deployments for Flutter An
 - Xealth Employee's `./deploy` promotes `development`/`development-backup`; `./deploy --prod` promotes `production`/`production-backup`. `playstorerelease.sh development` selects Fastlane lane `internaltest` (Play track `internal`); no argument retains production behavior.
 - Xealth Admin also has an Android development workflow on `development` invoking `internaltest` with `main_dev.dart`, alongside its development web deploy. It reuses the existing Play secret `XEALTH_ADMIN_PLAY_CREDENTIALS_JSON` and signing identity, shares concurrency with Android production, and preserves `production` and legacy `release` script/lane behavior. Neither Xealth app needs an `internaltest` branch or deploy flag.
 - When both tracks use the same Play package/signing identity, use the same concurrency group for both workflows and ensure each uploaded version code exceeds all prior uploads. Internal testing is not a separate installed app; confirm testers understand it uses the development backend.
-- Reconstruct signing and service-account files from secrets for both workflows, with normalized CI-relative keystore paths and cleanup after failure. Do not print credentials. Existing tracked credentials require separately coordinated rotation/history cleanup; ignore rules alone do not remove them.
+- By default reconstruct signing and service-account files from secrets for both workflows, with normalized CI-relative keystore paths and cleanup after failure. For an explicitly authorized repository-signing exception, use the tracked signing files instead and clean up only injected credentials. Do not print credentials. Existing tracked credentials require separately coordinated rotation/history cleanup; ignore rules alone do not remove them.
 - Xealth Employee secrets: `XEALTH_EMPLOYEE_ANDROID_KEYSTORE_BASE64`, `XEALTH_EMPLOYEE_ANDROID_KEY_PROPERTIES`, and `XEALTH_EMPLOYEE_PLAY_CREDENTIALS_JSON`. Its development workflow uses a guarded `development` ref and environment; production behavior and application ID stay unchanged.
 
 When a Flutter app has multiple entrypoints (e.g., `main_dev.dart`, `main_prod.dart`), specify the production target when building the app bundle:
@@ -62,16 +62,30 @@ When automating this deployment via GitHub Actions:
 - Set up Java 17 (`actions/setup-java@v4` with Zulu distribution).
 - Set up Flutter stable (`subosito/flutter-action@v2`).
 - Set up Ruby 3.2 (`ruby/setup-ruby@v1`) for Fastlane.
-- **Inject Secrets**: Reconstruct the Android signing keystore, `key.properties`, and the Play Store service account JSON (`playstore-credentials.json`) from GitHub Secrets before running the build step.
+- **Inject Secrets**: By default reconstruct the Android signing keystore, `key.properties`, and the Play Store service account JSON (`playstore-credentials.json`) from GitHub Secrets before running the build step. An authorized repository-signing exception uses checked-in signing files and injects only the service-account JSON.
 - Run `playstorerelease.sh`.
 
 ## Security Warning
-- **Never commit** signing keys, keystores, or service account credentials.
-- Your `.gitignore` MUST include:
+- **Default:** do not commit signing keys, keystores, or service account credentials.
+- By default `.gitignore` includes:
   - `android/fastlane/playstore-credentials.json`
   - `android/key.properties`
   - `android/app/*.jks` (e.g., `upload-keystore.jks`)
-- Use GitHub Secrets (stored as base64 or raw text) to inject these files dynamically during the CI run.
+- Use GitHub Secrets (stored as base64 or raw text) to inject these files dynamically during the CI run, unless the signing exception below applies.
+
+### Explicit repository-signing exception
+
+- Only when the user explicitly requests tracked Android signing material after accepting the exposure risk, document a repository-scoped exception. Do not apply it to other apps automatically.
+- Masar mobile (`flutter_apps/masar_mobile_app`) has this authorization: track `android/key.properties` and `android/app/upload-keystore.jks`; retain only `PLAYSTORE_SERVICE_ACCOUNT_JSON` as the Android workflows' required GitHub secret.
+- This exposes the keystore and passwords to everyone with repository/history access. Keep service-account JSON ignored and secret-injected; never print passwords or key contents in logs.
+- Preserve the existing signing identity. Restore authorized existing material when available; do not generate or rotate an upload key without explicit authorization and checking Play compatibility.
+- Use `storeFile=upload-keystore.jks`, relative to `android/app`, for portable local and CI builds. Validate tracked files exist before building. Cleanup must not delete tracked signing files.
+
+## Verification
+
+- Check the workflow secret references match the selected signing policy and service-account credentials remain ignored.
+- Verify keystore/password/alias compatibility without printing credentials; preserve existing unrelated changes.
+- Run both skill catalog validators after editing this skill.
 
 ## Reference Files
 You can find generic templates in the `reference/` directory of this skill:
