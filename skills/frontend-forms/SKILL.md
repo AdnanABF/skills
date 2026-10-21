@@ -12,14 +12,15 @@ Apply to every create/edit form, onboarding flow, profile form, filter form with
 ## When Not To Apply
 
 - Do not use this skill for a one-click confirmation, a search box without persisted state, or a display-only detail page.
+- A copy-only edit inside a form does not activate this skill unless field or form behavior changes.
 - Apply only the relevant validation and input rules to compact inline controls.
 
-## Read Alongside
+## Companion Skills
 
 - Required: `frontend-ui-states.md` for remote loading or save failures.
 - Destructive or modal flows: `frontend-interaction-patterns.md`.
 - Flutter implementation: `flutter-forms.md`; Next.js implementation: `nextjs-forms.md`.
-- Development autofill: `frontend-dummy-data.md`.
+- Development autofill: `frontend-dummy-data.md` only when adding or changing autofill behavior.
 
 ## Layout And Structure
 
@@ -55,9 +56,9 @@ Apply to every create/edit form, onboarding flow, profile form, filter form with
 - Apply format validation for structured fields:
   - Email: reject values that do not match `user@domain.tld`.
   - Phone: validate expected digit length/format for the selected country code.
-  - URL: require `http://` or `https://` and a valid domain.
+  - URL: default to `http://` or `https://` and a valid host. Permit localhost, internal hosts, or other schemes only when the field's documented contract supports them.
   - Numeric fields: reject non-numeric input and enforce min/max bounds where applicable.
-  - Date fields: reject future dates for birth dates and past dates for expiry dates.
+  - Date fields: reject future birth dates. Default to rejecting past expiry dates for new active credentials; allow historical expiry dates when the editing/import workflow explicitly supports them.
 
 ## Keyboard / Input Type Mapping
 
@@ -84,7 +85,7 @@ Set autocomplete/autofill hints where supported.
 ## Random Data Filling
 
 - Follow `frontend-dummy-data.md`.
-- Every non-trivial form should provide a dev-only autofill button.
+- Default to dev-only autofill for non-trivial data-entry forms. Do not add it solely for a copy-only change, or to credential, OTP, payment, or other sensitive forms without an explicit safe testing requirement.
 - Autofill values must come from the single shared platform generator and write into the same controlled state as manual input.
 
 ## Verification
@@ -93,3 +94,4 @@ Set autocomplete/autofill hints where supported.
 - Verify a pending save prevents duplicate submission and exposes one clear success or failure outcome.
 - Verify server validation errors remain attached to the affected fields where possible.
 - Verify the form remains usable with the keyboard open on supported mobile widths and at desktop widths.
+- Verify workflow-specific validation exceptions against the field/API contract, and report actual checks and any unverified interactions.

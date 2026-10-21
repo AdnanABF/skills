@@ -148,6 +148,50 @@
     ]
   },
   {
+    "scenario": "Flutter login text typo only; no field, layout, networking, or state behavior changes",
+    "skills": ["flutter-linting"],
+    "forbidden_skills": ["frontend-forms", "frontend-device-layout", "flutter-networking", "flutter-state-management"],
+    "forbidden_actions": ["deploy", "create-skill", "refactor-auth"],
+    "cases": [
+      {"skills": ["flutter-linting"], "actions": [], "valid": true},
+      {"skills": ["flutter-linting", "frontend-forms"], "actions": [], "valid": false},
+      {"skills": ["flutter-linting"], "actions": ["refactor-auth"], "valid": false},
+      {"skills": [], "actions": [], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Add a Flutter searchable Frappe link field with new API lookup calls to an existing form, without backend or deployment changes",
+    "skills": ["frontend-forms", "frontend-ui-states", "frontend-api-client", "flutter-forms", "flutter-networking", "frappe-api-contracts", "flutter-linting"],
+    "forbidden_skills": ["flutter-web-deployment", "frappe-deployment", "frontend-dummy-data"],
+    "forbidden_actions": ["deploy", "create-skill"],
+    "cases": [
+      {"skills": ["frontend-forms", "frontend-ui-states", "frontend-api-client", "flutter-forms", "flutter-networking", "frappe-api-contracts", "flutter-linting"], "actions": [], "valid": true},
+      {"skills": ["frontend-forms", "flutter-forms", "flutter-linting"], "actions": [], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Diagnose Flutter cross-origin Frappe Socket.IO failure read-only, without changing proxy or deployment configuration",
+    "skills": ["project-connections", "frontend-api-client", "flutter-networking", "setup-frappe-realtime"],
+    "forbidden_skills": ["flutter-web-deployment", "github-actions-deployment"],
+    "forbidden_actions": ["deploy", "edit-proxy", "restart-services"],
+    "cases": [
+      {"skills": ["project-connections", "frontend-api-client", "flutter-networking", "setup-frappe-realtime"], "actions": [], "valid": true},
+      {"skills": ["project-connections", "frontend-api-client", "flutter-networking", "setup-frappe-realtime", "flutter-web-deployment"], "actions": [], "valid": false},
+      {"skills": ["project-connections", "frontend-api-client", "flutter-networking", "setup-frappe-realtime"], "actions": ["restart-services"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Explain an existing Flutter Android Play Store release script without modifying or executing it",
+    "skills": ["flutter-android-release"],
+    "forbidden_skills": ["skill-updates"],
+    "forbidden_actions": ["deploy", "publish-release", "create-skill", "edit-files", "run-release-script"],
+    "cases": [
+      {"skills": ["flutter-android-release"], "actions": [], "valid": true},
+      {"skills": ["flutter-android-release"], "actions": ["run-release-script"], "valid": false},
+      {"skills": ["flutter-android-release", "skill-updates"], "actions": [], "valid": false}
+    ]
+  },
+  {
     "scenario": "Production Next.js PWA safe-area layout in browser and installed standalone modes without a desktop device preview",
     "skills": [
       "frontend-device-layout",

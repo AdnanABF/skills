@@ -75,9 +75,22 @@ Use this skill when creating or updating GitHub Actions workflows that build, re
 - Prefer `actions/setup-node` with the project’s required Node version and npm cache
 - Declare the package manager and exact version in `package.json` (for example, `"packageManager": "npm@11.6.2"`) and install that version in CI before `npm ci`. The lockfile generator and CI installer must use the same package-manager version to avoid optional-dependency and lockfile compatibility failures.
 - For standalone Next.js deploys, sync only runtime artifacts such as `.next/standalone`, `.next/static`, `public/`, and the runtime launcher
-- Keep production environment values server-managed unless the user explicitly asks for a GitHub-managed env strategy
+- When a deployment needs `.env`, `.env.production`, or an equivalent environment file, use GitHub environment-scoped variables and secrets as the source of truth and generate the file in the workflow. Follow the environment-file contract below.
 - Distinguish successful publishing from later artifact-retention failures. If a Play upload succeeded but `actions/upload-artifact` failed on storage quota, do not rerun the old release and upload its version code again. For redundant retained artifacts, remove the upload step when that fits the release contract; otherwise resolve quota/retention separately. Validate recovery at a new release commit with a new version code and report the old run as historically failed rather than rewriting its outcome.
-- Do not copy repo `.env.production` to the server when the chosen contract is server-managed env
+- Do not deploy a developer's local or committed `.env.production` as authoritative configuration; deploy the validated file generated from the selected GitHub environment.
+
+## GitHub-Managed Deployment Environment Files
+
+- Apply this contract when adding or changing a deployment that consumes an environment file. It covers development and production independently; it does not require introducing an env file into an app that does not need one.
+- Inventory the actual build-time and runtime variables used by the application and launcher. Store non-sensitive values in GitHub Variables and credentials/API keys in GitHub Secrets, scoped to the selected deployment environment. Document every required name and its purpose. Do not fall back to another environment or to a developer's local file when configuration is missing.
+- Inspect existing GitHub entries before writing them; preserve unrelated values. Upload existing authorized credentials through stdin without displaying them. Ask for missing credential material rather than inventing it or silently reusing another app/environment's credentials. Permission to update workflow code alone does not authorize changing GitHub configuration or deploying.
+- Generate the complete env file before the build when configuration affects compilation. Use the same resolved configuration for runtime deployment. Public frontend variables (for example `NEXT_PUBLIC_*`) are exposed in compiled browser assets even if stored as GitHub Secrets; never put private server credentials in those variables.
+- Fail before build or SSH on missing required values or invalid configuration. Serialize values using a tested generator compatible with the application's dotenv parser and launcher. Prevent newline injection and shell evaluation; do not interpolate secret expressions directly into shell source or use `eval`. For shell-sourced files, safely encode values or reject unsupported characters explicitly.
+- Use restrictive permissions (`umask 077` or mode `600`) for generated files. Do not print file contents or secret values, enable shell tracing around them, commit them, or include them in cached/uploaded build artifacts. Keep runtime secrets step-scoped where practical.
+- Exclude `.env*` from general artifact rsync, especially `--delete` syncs. Upload the intended generated env file in a dedicated step to a restrictive temporary file on the same filesystem as the destination; atomically rename it after successful artifact sync and before process restart. Static browser apps consume compile-time configuration and do not need a server env upload unless their runtime explicitly uses it.
+- Do not require a pre-existing remote env file for this managed flow. GitHub supplies its complete contents; manual server edits are overwritten on the next deployment. Coordinate migration of any existing server-only settings before enabling replacement so required credentials are not lost.
+- Clean up injected runner env files and credentials with `if: always()`, including failure paths. Restart only after successful env installation, then check local and public health. Test env generation, replacement, permissions, missing values, quoting/injection rejection, target isolation, and sync/install/restart ordering without contacting production.
+- A documented, explicitly approved server-managed exception may remain for a specific service. Preserve it during unrelated edits rather than silently migrating unknown secrets; do not treat legacy server-managed examples as the default for new workflows.
 
 ## SSH Deploy Rules
 
@@ -95,19 +108,19 @@ Use this skill when creating or updating GitHub Actions workflows that build, re
 Use this pattern for long-running application services such as standalone Next.js or Node.js applications deployed over SSH:
 
 - Default new deployments to a directory owned by the SSH deployment user, normally `$HOME/<app-name>`, instead of `/var/www/<app-name>`.
-- Resolve `$HOME` on the remote server over SSH and then use the resulting absolute path for `ssh`, `rsync`, process-manager working directories, and server-managed environment files. Do not construct `/home/<user>` because root and custom user homes differ.
+- Resolve `$HOME` on the remote server over SSH and then use the resulting absolute path for `ssh`, `rsync`, process-manager working directories, and deployed environment files. Do not construct `/home/<user>` because root and custom user homes differ.
 - Keep application files, release artifacts, runtime environment files, and process-manager state owned by the deployment user. Routine deployments should not require `sudo`.
 - Run PM2 or the selected process manager as the same deployment user. Install user-scoped tools under `$HOME/.local` when practical and include `$HOME/.local/bin` in non-interactive SSH `PATH`.
 - Keep nginx virtual hosts, TLS certificates, firewall rules, and PM2/systemd boot registration as separate one-time server setup. Nginx proxies to the loopback application port and does not require application files under `/var/www`.
 - Preserve an existing `/var/www`, `/opt`, or system-user layout when it is already deployed or explicitly required; do not migrate persisted production paths without approval.
-- Keep server-managed `.env.production` in the user-owned application root and copy or link it into the active release only when the runtime requires that location.
+- Install the GitHub-generated `.env.production` in the user-owned application root or active release location required by the runtime, using the atomic replacement contract above.
 
 ## Pipecat Systemd Deployments
 
 - Read `pipecat-self-hosting.md` alongside this skill.
 - Start from `reference/pipecat-systemd-production.yml` and copy `reference/pipecat-deploy` to the repository root as `deploy`. Rename generic `PIPECAT_*` secrets and variables only when an app prefix improves clarity.
 - Deploy from `production`, keep `workflow_dispatch`, and use the root `deploy` helper for normal promotion.
-- Keep `.env`, dependencies, and the virtual environment server-managed; routine releases sync only `server/bot.py` to the configured runtime directory.
+- Existing Pipecat services with an explicitly retained server-managed `.env` contract keep that exception; routine releases sync only `server/bot.py`. For a new or authorized env-management migration, apply the GitHub-managed environment-file contract above while keeping dependencies and the virtual environment server-managed.
 - Upload to a temporary filename, preserve `bot.py.previous`, and atomically replace the runtime file before restart.
 - Use `systemctl --no-block restart`; never let an SSH session wait indefinitely for systemd shutdown or startup.
 - Bound SSH, rsync, and curl independently. Print phase markers before preflight, upload, restart, local health, and public health.
@@ -199,7 +212,7 @@ It supports optional `FLUTTER_WEB_SSH_PORT`, `FLUTTER_WEB_REMOTE_PATH`, and
 - Remote dir: `/var/www/masarnext`
 - PM2 app: `masarnext`
 - Runtime bind: `127.0.0.1:3000`
-- Production env file stays on the server at `/var/www/masarnext/.env.production`
+- Masar's active web repository is `next_apps/masar-nextjs/`. Both deployment workflows generate `.env.production` with `scripts/write-deployment-env.py` from environment-scoped `MASARNEXT_PROD_*` or `MASARNEXT_DEV_*` settings. The remote env file is replaced at `<REMOTE_APP_DIR>/.env.production`; `/var/www/masarnext` is the existing path, not a source of manually managed configuration.
 
 ## Coordination
 
@@ -217,6 +230,7 @@ It supports optional `FLUTTER_WEB_SSH_PORT`, `FLUTTER_WEB_REMOTE_PATH`, and
 - Run `bash -n deploy` and verify it refuses dirty worktrees, detached HEAD, `production`, and `production-backup`.
 - Verify every referenced secret and variable is documented.
 - Verify the declared package-manager version matches the CI setup and that its clean install command succeeds locally.
+- For env-consuming deployments, verify environment-scoped variable/secret inventory, safe generation before build, explicit atomic runtime installation before restart, restrictive permissions, cleanup on failure, and preservation of unrelated credentials during migration. Do not describe a generated-file test as proof of a live deployment.
 - For Frappe workflows, confirm private keys are step-scoped and local credential files are excluded from source sync.
 - Run the same production build command locally when build flags, entrypoints,
   generated assets, or compile-time definitions change.

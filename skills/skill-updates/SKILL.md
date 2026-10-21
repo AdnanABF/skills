@@ -53,6 +53,8 @@ On confirmation, execute the chosen path below.
 
 3. **Keep platform specifics out of shared skills.** Shared `frontend-*` skills must not contain `lib/core/` or other platform-specific paths (quality warning). Put platform examples in a `references/` subfolder or in the platform adapter skill. See `frontend-button-clicks` for the `references/` pattern.
 
+   Keep the entry-point skill focused; move long examples and uncommon exceptions into `references/`. Include explicit non-triggers and distinguish required companions from optional companions with their activation conditions. Do not load related skills solely because their surface exists in a touched file.
+
 4. **Do not reference skill names that do not exist.** A backtick reference of the form <code>`name.md`</code> whose name starts with a known prefix is validated; a dangling reference fails the catalog check. Only backtick-reference skills that already exist in `.agents/skills/`.
 
 ## Updating an Existing Skill
@@ -60,7 +62,7 @@ On confirmation, execute the chosen path below.
 1. Read the current `SKILL.md` before editing.
 2. Edit in place. Keep the `name` field unchanged — it must match the directory name.
 3. Keep `description` starting with "Use when".
-4. If the change is really a new routing scenario rather than new skill content, add an entry to `.agents/skills/routing-scenarios.json` instead of bloating the skill body.
+4. If the change is really a new routing scenario rather than new skill content, add an entry to `.agents/skills/routing-scenarios.json` instead of bloating the skill body. Follow `.agents/skills/routing-scenarios.md`; include forbidden skills/actions and accepted/rejected selections for boundary cases. These are explicit routing-contract checks, not a model-routing benchmark.
 5. Do not introduce dangling backtick `.md` references.
 
 ## Registering the Skill
@@ -80,6 +82,7 @@ After every create/update/rename, run both validators. They must exit 0 with no 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 .agents/scripts/validate_skills.py
 PYTHONDONTWRITEBYTECODE=1 python3 .agents/scripts/validate_skill_scenarios.py
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .agents/scripts -p 'test_*.py'
 ```
 
 Quality warnings (long skills without a Verification section, platform specifics in shared skills, heavy absolute language) do not block, but fix them when practical.

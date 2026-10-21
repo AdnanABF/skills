@@ -5,6 +5,11 @@ description: Use when adding or changing development-only random data filling be
 
 This skill applies to development-only random data filling for frontend forms.
 
+## When Not To Apply
+
+- Do not load this skill just because a form exists; use it when adding or changing development autofill.
+- Do not add autofill to credential, OTP, payment, or other sensitive forms without an explicit safe testing requirement. Never populate real secrets or submit data automatically.
+
 ## Core Rule
 
 Each platform has exactly one shared dummy data generator. Never create feature-specific generators or inline fake values in form components.
@@ -61,3 +66,9 @@ Both platform generators must cover:
 | `duration()` | Duration in minutes |
 
 Implementation examples belong in the platform-specific form or utility skill, not here.
+
+## Verification
+
+- Verify autofill is unavailable in release builds.
+- Verify generated values update ordinary form state and respect dependent-field validation.
+- Verify autofill does not submit the form, use real secrets, or trigger unintended external actions.

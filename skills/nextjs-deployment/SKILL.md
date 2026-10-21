@@ -29,7 +29,7 @@ Use this skill when explaining, creating, or updating deployment workflows and s
 - Resolve the remote `$HOME` over SSH and use the resulting absolute path. Do not assume the home is `/home/<user>`.
 - Run the standalone server and PM2 as the same SSH deployment user so routine artifact sync and restart operations do not require `sudo`.
 - Use an app-specific loopback port and proxy it through nginx; nginx does not require the application to live under `/var/www`.
-- Keep `.env.production` server-managed at `$HOME/<app-name>/.env.production` unless the project explicitly chooses another environment strategy.
+- Generate `.env.production` from GitHub environment-scoped variables and secrets and install it at `$HOME/<app-name>/.env.production` (or the active release path required by the runtime). Follow the environment-file contract in `github-actions-deployment.md`.
 - Install PM2 under `$HOME/.local` when global package installation would require elevated permissions, and include `$HOME/.local/bin` in the remote `PATH`.
 - Configure nginx, TLS, and PM2 boot startup separately as one-time privileged server setup.
 
@@ -74,6 +74,7 @@ Use this skill when explaining, creating, or updating deployment workflows and s
 - For script-only changes, run `bash -n deploy.sh version_increment.sh setup_nginx.sh` for the scripts that exist.
 - Verify `version_increment.sh --dry-run` after creating or changing the version increment script.
 - Run the clean install and production build with the package-manager version declared by the project.
+- Test GitHub-driven env generation for both targets, missing/invalid values, safe shell/dotenv serialization, file permissions, atomic replacement and cleanup. Check generation precedes build and runtime installation precedes PM2 restart; no pre-existing remote env file should be required for the managed flow.
 
 ## Nginx Pattern
 
@@ -89,11 +90,11 @@ Use this skill when explaining, creating, or updating deployment workflows and s
 
 ## Environment Rules
 
-- Read the backend URL from `.env.production` at runtime.
+- Read the backend URL from the GitHub-generated `.env.production` at runtime.
 - Do not hardcode the API base URL inside deployment scripts.
-- Production `.env.production` is server-managed by default and stays in the remote application root. New services normally use `$HOME/<app-name>/.env.production`; Masar retains `/var/www/masarnext/.env.production` as an existing project-specific path.
-- Do not sync a repo or local `.env.production` to production unless the user explicitly asks for a deploy-managed env strategy.
-- If the user explicitly chooses deploy-managed env, validate that the env file is intentional before syncing it.
+- GitHub Variables hold non-sensitive settings and GitHub Secrets hold credentials/API keys, scoped separately to development and production. Generate and validate the complete `.env.production` before `npm run build`; compile-time `NEXT_PUBLIC_*` values must match the selected environment and are public in browser output.
+- Deploy the generated env file explicitly with mode `600`, atomically replacing the remote file after artifact sync and before PM2 restart. Exclude `.env*` from standalone artifact sync; do not upload local/committed dotenv files as deployment configuration. Clean up generated runner files on success and failure.
+- New services normally use `$HOME/<app-name>/.env.production`; Masar retains `/var/www/masarnext/.env.production` as an existing path but its contents are GitHub-managed. Do not require the remote file to exist before first deployment. Preserve documented server-managed exceptions only when explicitly approved, and inventory server-only settings before migration.
 
 ## Safety Rules
 

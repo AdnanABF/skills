@@ -46,6 +46,14 @@ Both Flutter applications support an `API_BASE_URL` override. Read backend URLs 
 
 ## Reading Order
 
+### Scope And Precedence
+
+- Route by the behavior being changed, not every surface present in the file. A copy-only correction does not activate form, layout, networking, or state-management skills unless those behaviors also change. Platform-wide requirements such as Flutter linting still apply.
+- Required companions apply when their stated trigger is met. Optional companions are not a blanket reading list. Follow the sequences below for the relevant workflow, not for unrelated edits inside that workflow's files.
+- Keep product rules in shared skills and implementation rules in platform adapters. This file owns routing, precedence, and workspace connections; avoid copying detailed skill rules here.
+- Reading a deployment, release, or destructive-action skill does not authorize executing those actions. Explanation-only requests remain read-only.
+- Treat recommendations as defaults with documented workflow exceptions. Security, permissions, data integrity, and explicit workspace constraints remain requirements; do not invent exceptions to them.
+
 1. Identify the platform and product surface: admin, public, auth, listing, form, mobile, tablet, desktop, or backend.
 2. For any frontend/UI work, read the matching platform-agnostic `frontend-*` skill first.
 3. Then read the platform adapter: Flutter, Next.js, Frappe Desk, or backend.
@@ -184,6 +192,13 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 | `country-code-picker.md` | Legacy references that should route to `frontend-country-code-picker.md` |
 | `login-screen-ui.md` | Legacy references that should route to `frontend-auth-entry-ui.md` |
 
+## Completion Evidence
+
+- Report checks actually run, their results, and relevant checks left unverified. Do not describe a planned check as passed.
+- UI changes: check affected interactions, keyboard operation, and relevant viewport sizes; copy-only changes need not trigger unrelated interaction testing.
+- API changes: check permissions, invalid inputs, and the response contract. Background-job changes also check enqueue/commit ordering, observable failure state, and retry safety where applicable.
+- Deployment work: distinguish workflow started, build passed, deployment completed, and live behavior verified. Report only the stages supported by evidence.
+
 ## Catalog Quality
 
 Validate the skill catalog after changing skills or `.agents/AGENTS.md`:
@@ -191,6 +206,7 @@ Validate the skill catalog after changing skills or `.agents/AGENTS.md`:
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 .agents/scripts/validate_skills.py
 PYTHONDONTWRITEBYTECODE=1 python3 .agents/scripts/validate_skill_scenarios.py
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .agents/scripts -p 'test_*.py'
 ```
 
-The catalog validator fails structural problems and reports content-quality warnings. Scenario checks ensure documented task routes only reference active skills.
+The catalog validator fails structural problems and reports content-quality warnings. Scenario checks validate active references and explicit required/forbidden skill and action expectations. See `.agents/skills/routing-scenarios.md` for the schema and limitations; these checks do not evaluate model prompt understanding.
