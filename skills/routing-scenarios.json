@@ -1,5 +1,37 @@
 [
   {
+    "scenario": "Design software context and application architecture diagrams only in Penpot, without UI design or implementation",
+    "skills": ["penpot-solution-design"],
+    "forbidden_skills": ["frontend-forms", "flutter-linting", "nextjs-page-performance"],
+    "forbidden_actions": ["edit-application-code", "deploy"],
+    "cases": [
+      {"skills": ["penpot-solution-design"], "actions": ["edit-penpot-design"], "valid": true},
+      {"skills": [], "actions": ["edit-penpot-design"], "valid": false},
+      {"skills": ["penpot-solution-design", "frontend-forms"], "actions": [], "valid": false},
+      {"skills": ["penpot-solution-design"], "actions": ["edit-application-code"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Design architecture plus responsive admin listing UI with search, filters, and empty/error states in Penpot, without application implementation",
+    "skills": ["penpot-solution-design", "frontend-admin-panels", "frontend-listing-screens", "frontend-ui-states", "frontend-device-layout"],
+    "forbidden_skills": ["flutter-listing-screens", "flutter-linting", "nextjs-listing-screens"],
+    "forbidden_actions": ["edit-application-code", "deploy"],
+    "cases": [
+      {"skills": ["penpot-solution-design", "frontend-admin-panels", "frontend-listing-screens", "frontend-ui-states", "frontend-device-layout"], "actions": ["edit-penpot-design"], "valid": true},
+      {"skills": ["penpot-solution-design"], "actions": [], "valid": false},
+      {"skills": ["penpot-solution-design", "frontend-admin-panels", "frontend-listing-screens", "frontend-ui-states", "frontend-device-layout", "flutter-listing-screens"], "actions": [], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Read-only review of an existing Penpot solution blueprint with no UI behavior changes",
+    "skills": ["penpot-solution-design"],
+    "forbidden_actions": ["edit-penpot-design", "edit-application-code", "deploy"],
+    "cases": [
+      {"skills": ["penpot-solution-design"], "actions": ["inspect-penpot-design"], "valid": true},
+      {"skills": ["penpot-solution-design"], "actions": ["edit-penpot-design"], "valid": false}
+    ]
+  },
+  {
     "scenario": "Set up GitHub Actions deployment for a new Flutter mobile app backed by Flutter Utils, including release gates",
     "skills": ["project-connections", "github-actions-deployment", "frontend-ui-states", "frontend-interaction-patterns", "frontend-device-layout", "frontend-api-client", "flutter-app-release-gates", "flutter-android-release", "flutter-ios-release", "flutter-networking", "flutter-linting"]
   },
