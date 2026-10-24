@@ -25,7 +25,17 @@ This skill also works without a codebase: product ideas, operational workflows, 
 - Read applicable `AGENTS.md` and project instructions before working in a codebase.
 - Honor Plan mode and other write restrictions. If writing HTML is prohibited, discuss the visual structure in the conversation and wait for a mode change. This skill does not authorize writes.
 - Summarize intended files and changes before editing.
-- Default to a clearly named HTML file under an existing `docs/` directory when authorized and appropriate. Do not modify application code merely to explain it.
+- Default to a clearly named HTML file in the target project's `docs/` directory when authorized and appropriate. Reuse its conventions and the document for the same feature; otherwise prefer `docs/features/<feature-name>.html`. If no `docs/` exists, state that creating it is part of the requested artifact, subject to active write permissions. Do not modify application code merely to explain it.
+
+### Coordination with a planning agent
+
+- This skill remains reusable for plans, implementation explanations, and current/proposed comparisons. It does not require a custom agent or authorize any write by itself.
+- When used by `visual-planner`, the agent owns requirements discovery, project selection, recommendations, and decision tracking. This skill owns visual structure, diagrams, self-contained HTML, accessibility, walkthroughs, and artifact validation.
+- Reuse the brief, evidence, decisions, assumptions, and open questions already established in the conversation. Do not repeat answered questions; ask only when new ambiguity changes the explanation.
+- Discussion-only planning stays in the conversation. Create or update HTML when requested, not automatically after every reply. Summarize the intended path and changes first.
+- Choose the target project's documentation folder, not another project's merely because it is writable. Root documentation is for workspace-wide topics. Ask when ownership is unclear.
+- Mark observed facts, proposals, assumptions, undecided choices, and explicitly approved decisions separately. Approval does not mean implemented or authorize application changes.
+- Keep agent registration and enforced permissions in the agent definition, not in this skill. Follow the active agent's restrictions even when a suggested browser or shell validation step is unavailable; report the limitation and hand off stronger checks if needed.
 
 ## 2. Build a small behavioral model
 

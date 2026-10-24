@@ -25,11 +25,13 @@ Follow these Flutter theming implementation rules strictly. Visual behavior and 
 
 ## Theme Usage
 
+- Before implementing new screens/components or visual changes, follow `frontend-design-consistency.md`: inspect the app shell, comparable screens, theme, and shared widgets. Match composition and component patterns, not only theme colors.
+- Check the app's existing theme layer and `lib/core/widgets/` before adding local styling. Reuse established tokens and widgets; inheriting `ThemeData` does not justify a screen-specific visual language.
 - Define colors, text styles, and spacing in `ThemeData` or the app theme layer.
 - Reference theme values via `Theme.of(context)` or established app theme constants.
 - Do not hardcode colors or font sizes in feature widget code when theme values exist.
 - Support light/dark themes where the app supports them.
-- In this app, keep detail/list surfaces on white backgrounds by using `scaffoldBackgroundColor`/`canvasColor` set to white in the app theme.
+- Follow the target app's established surface hierarchy for detail/list backgrounds; do not force a global white background or change unrelated screens to style one feature.
 - For form controls, prefer shared input tokens rather than per-screen overrides: darker outline borders for clearer field distinction and a subtle filled background for text inputs.
 
 ## Verification

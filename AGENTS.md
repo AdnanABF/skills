@@ -56,6 +56,7 @@ Both Flutter applications support an `API_BASE_URL` override. Read backend URLs 
 
 1. Identify the platform and product surface: admin, public, auth, listing, form, mobile, tablet, desktop, or backend.
 2. For any frontend/UI work, read the matching platform-agnostic `frontend-*` skill first.
+   For new screens/components or visual changes on any platform/framework, read `frontend-design-consistency.md` first: inspect the app's overall UI, shared components, and comparable screens, then follow the established design patterns. Copy-only and nonvisual logic changes do not require this visual audit.
 3. Then read the platform adapter: Flutter, Next.js, Frappe Desk, or backend.
 4. If a platform adapter and a `frontend-*` skill overlap, the `frontend-*` file owns product/UI behavior and the platform file owns implementation syntax, component paths, persistence, APIs, and tooling.
 
@@ -87,6 +88,7 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 
 | Skill | When to apply |
 |-------|---------------|
+| `frontend-design-consistency.md` | New or visually changed screens/components on any platform: inspect the app's overall UI, theme, shared components, and comparable screens, and follow their established design patterns |
 | `frontend-device-layout.md` | Any desktop, tablet, mobile, responsive behavior, safe areas, prototype or production PWA layout, proportional scaling, admin density, or mobile fallback decision |
 | `frontend-mobile-app-prototyping.md` | Any browser-hosted clickable mobile app concept with production-oriented structure, a desktop client journey navigator, realistic device frame, or mobile PWA presentation |
 | `frontend-listing-screens.md` | Any listing/table/index screen UX: pagination, search/filter/refresh/add header, row actions, table headers, loading/empty/error states, bulk selection, page-size options, and persistence |
@@ -185,6 +187,8 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 |-------|---------------|
 | `skill-updates.md` | Task not covered by any existing skill, or creating/updating skills in the `.agents/skills` catalog |
 | `project-local-feature-branches.md` | Local-only feature branches, preserving working changes, and isolating feature commits from open PRs in one working folder |
+| `erp-assistant.md` | Read-only live CoreAxis ERP record inspection, search, analysis, reporting, and proposed change plans through MCP; not application implementation or ERP mutation execution |
+| `project-manager.md` | Read-only live CoreAxis ERP project health, tasks, deadlines, milestones, dependencies, risks, and status briefs; read `erp-assistant.md` first |
 | `project-pr-watcher.md` | Project-wide scheduled PR watcher discovery, review, blocker comments, protected merges, dependency-aware deployment, and durable recovery |
 
 ### Compatibility Adapters
@@ -194,6 +198,15 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 | `admin-panels.md` | Legacy references that should route to `frontend-admin-panels.md` |
 | `country-code-picker.md` | Legacy references that should route to `frontend-country-code-picker.md` |
 | `login-screen-ui.md` | Legacy references that should route to `frontend-auth-entry-ui.md` |
+
+## Visual Planning Agent
+
+- Select `visual-planner` for collaborative feature planning with diagram-first HTML documentation, not application implementation. The complete canonical definition, including its permissions, is `.agents/agents/visual-planner.md`.
+- OpenCode discovers it through the project-local symlink `.opencode/agents/visual-planner.md`. No global configuration or duplicate definition is required; `opencode.json` continues to register workspace instructions and skills.
+- The agent uses `visual-explainer.md` for visual artifacts and reads other skills only when their behavior is being designed. Discuss first; write documentation when requested. Built-in Plan mode remains read-only outside its permitted plan directory.
+- Choose the target project's own `docs/` and existing conventions; default to `docs/features/<feature-name>.html`. Multiple projects may each have a `docs/` directory. Ask when ownership is unclear; use root documentation only for workspace-wide topics.
+- The agent may edit documentation only beneath exact `docs` directory segments inside `/home/lubshad/frappe-bench`. Its permissions deny shell execution, delegation, and external tools. The workspace boundary is installation-specific and must be reviewed if this catalog moves.
+- Plan approval is not implementation authorization. Switch to an implementation agent for application changes, deployments, migrations, agent/skill maintenance, or validation requiring tools unavailable to the planner.
 
 ## Completion Evidence
 

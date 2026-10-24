@@ -1,5 +1,85 @@
 [
   {
+    "scenario": "Implement a new Flutter screen matching the existing app's overall UI and component patterns",
+    "skills": ["frontend-design-consistency", "flutter-theming", "flutter-common-widgets", "flutter-linting"],
+    "forbidden_actions": ["introduce-unrequested-design-language"],
+    "cases": [
+      {"skills": ["frontend-design-consistency", "flutter-theming", "flutter-common-widgets", "flutter-linting"], "actions": ["inspect-app-design-patterns", "reuse-theme-and-components"], "valid": true},
+      {"skills": ["flutter-theming", "flutter-common-widgets", "flutter-linting"], "actions": ["reuse-theme-and-components"], "valid": false},
+      {"skills": ["frontend-design-consistency", "flutter-theming", "flutter-common-widgets", "flutter-linting"], "actions": ["introduce-unrequested-design-language"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Implement a visually changed React component using the existing app's design system",
+    "skills": ["frontend-design-consistency"],
+    "cases": [
+      {"skills": ["frontend-design-consistency"], "actions": ["inspect-app-design-patterns", "reuse-theme-and-components"], "valid": true},
+      {"skills": [], "actions": ["edit-component-styles"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Inspect live CoreAxis ERP customer records and propose an unapplied change through MCP",
+    "skills": ["erp-assistant"],
+    "forbidden_skills": ["project-manager"],
+    "forbidden_actions": ["mutate-erp", "run-server-python", "edit-application-code"],
+    "cases": [
+      {"skills": ["erp-assistant"], "actions": ["read-erp", "present-unapplied-plan"], "valid": true},
+      {"skills": [], "actions": ["read-erp"], "valid": false},
+      {"skills": ["erp-assistant"], "actions": ["mutate-erp"], "valid": false},
+      {"skills": ["erp-assistant"], "actions": ["run-server-python"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Prepare a read-only CoreAxis ERP project health brief covering tasks, milestones, deadlines, and blockers",
+    "skills": ["erp-assistant", "project-manager"],
+    "forbidden_actions": ["mutate-erp", "edit-application-code", "run-server-python"],
+    "cases": [
+      {"skills": ["erp-assistant", "project-manager"], "actions": ["read-erp", "report-project-health"], "valid": true},
+      {"skills": ["project-manager"], "actions": ["read-erp"], "valid": false},
+      {"skills": ["erp-assistant", "project-manager"], "actions": ["mutate-erp"], "valid": false},
+      {"skills": ["erp-assistant", "project-manager"], "actions": ["edit-application-code"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Visual Planner creates a new feature proposal in the identified target project's docs directory, without application implementation",
+    "skills": ["visual-explainer"],
+    "forbidden_actions": ["edit-application-code", "deploy", "edit-wrong-project-docs"],
+    "cases": [
+      {"skills": ["visual-explainer"], "actions": ["edit-target-project-docs"], "valid": true},
+      {"skills": [], "actions": ["edit-target-project-docs"], "valid": false},
+      {"skills": ["visual-explainer"], "actions": ["edit-wrong-project-docs"], "valid": false},
+      {"skills": ["visual-explainer"], "actions": ["edit-application-code"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Discuss a visual feature plan in conversation only without requesting an HTML artifact",
+    "skills": ["visual-explainer"],
+    "forbidden_actions": ["edit-docs", "edit-application-code", "deploy"],
+    "cases": [
+      {"skills": ["visual-explainer"], "actions": ["discuss-plan"], "valid": true},
+      {"skills": ["visual-explainer"], "actions": ["edit-docs"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Explain an existing implementation visually without proposing or implementing changes",
+    "skills": ["visual-explainer"],
+    "forbidden_actions": ["edit-application-code", "invent-implementation-evidence", "deploy"],
+    "cases": [
+      {"skills": ["visual-explainer"], "actions": ["inspect-source", "edit-target-project-docs"], "valid": true},
+      {"skills": ["visual-explainer"], "actions": ["invent-implementation-evidence"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Visual Planner receives approval and a request to implement a visual feature plan but must hand off instead",
+    "skills": ["visual-explainer"],
+    "forbidden_actions": ["edit-application-code", "deploy", "run-migration"],
+    "cases": [
+      {"skills": ["visual-explainer"], "actions": ["handoff-to-implementation-agent"], "valid": true},
+      {"skills": ["visual-explainer"], "actions": ["edit-application-code"], "valid": false},
+      {"skills": ["visual-explainer"], "actions": ["run-migration"], "valid": false}
+    ]
+  },
+  {
     "scenario": "Design software context and application architecture diagrams only in Penpot, without UI design or implementation",
     "skills": ["penpot-solution-design"],
     "forbidden_skills": ["frontend-forms", "flutter-linting", "nextjs-page-performance"],
