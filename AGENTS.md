@@ -182,6 +182,7 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 | Skill | When to apply |
 |-------|---------------|
 | `skill-updates.md` | Task not covered by any existing skill, or creating/updating skills in the `.agents/skills` catalog |
+| `project-local-feature-branches.md` | Local-only feature branches, preserving working changes, and isolating feature commits from open PRs in one working folder |
 | `project-pr-watcher.md` | Project-wide scheduled PR watcher discovery, review, blocker comments, protected merges, dependency-aware deployment, and durable recovery |
 
 ### Compatibility Adapters
