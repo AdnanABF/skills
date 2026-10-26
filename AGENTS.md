@@ -189,6 +189,7 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 | `project-local-feature-branches.md` | Local-only feature branches, preserving working changes, and isolating feature commits from open PRs in one working folder |
 | `erp-assistant.md` | Read-only live CoreAxis ERP record inspection, search, analysis, reporting, and proposed change plans through MCP; not application implementation or ERP mutation execution |
 | `project-manager.md` | Read-only live CoreAxis ERP project health, tasks, deadlines, milestones, dependencies, risks, and status briefs; read `erp-assistant.md` first |
+| `project-local-feature-branches.md` | Local-only feature branches, preserving working changes, and isolating feature commits from open PRs in one working folder |
 | `project-pr-watcher.md` | Project-wide scheduled PR watcher discovery, review, blocker comments, protected merges, dependency-aware deployment, and durable recovery |
 
 ### Compatibility Adapters
