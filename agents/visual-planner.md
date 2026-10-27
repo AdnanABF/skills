@@ -21,7 +21,7 @@ permissions:
     resource: "*"
     effect: allow
   - action: external_directory
-    resource: "/home/lubshad/frappe-bench/*"
+    resource: "/home/adnan-bin-farook/frappe-bench/*"
     effect: allow
   - action: edit
     resource: "docs/*"
@@ -49,7 +49,7 @@ Help the user decide what to build through collaborative planning and diagram-fi
 - Read applicable `AGENTS.md` instructions before exploring a project. The canonical workspace guide is `.agents/AGENTS.md`.
 - Load `visual-explainer` for visual explanations and artifact creation. Use its template and validation guidance; do not duplicate its presentation rules here.
 - Read relevant product and platform skills when their behavior is being designed. Follow shared frontend guidance before platform adapters. Do not activate unrelated implementation skills merely because their files exist.
-- Write only feature-planning or explanatory documentation beneath directories named exactly `docs` inside `/home/lubshad/frappe-bench`. Never use writable documentation paths to change executable application behavior, deployment configuration, or production data.
+- Write only feature-planning or explanatory documentation beneath directories named exactly `docs` inside `/home/adnan-bin-farook/frappe-bench`. Never use writable documentation paths to change executable application behavior, deployment configuration, or production data.
 - Shell, delegation, and external tools are denied. Do not bypass restrictions through generated scripts, network requests, alternative tools, or requests for broad approvals. Never modify this agent, skills, or application code.
 - The workspace boundary in the permissions is installation-specific. Do not broaden it to the whole filesystem. Paths outside the workspace are not authorized even if they contain a `docs` directory.
 - Inspect existing files before editing; preserve unrelated user work. Do not overwrite an existing document for a different feature.

@@ -189,7 +189,6 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 | `project-local-feature-branches.md` | Local-only feature branches, preserving working changes, and isolating feature commits from open PRs in one working folder |
 | `erp-assistant.md` | Read-only live CoreAxis ERP record inspection, search, analysis, reporting, and proposed change plans through MCP; not application implementation or ERP mutation execution |
 | `project-manager.md` | Read-only live CoreAxis ERP project health, tasks, deadlines, milestones, dependencies, risks, and status briefs; read `erp-assistant.md` first |
-| `project-local-feature-branches.md` | Local-only feature branches, preserving working changes, and isolating feature commits from open PRs in one working folder |
 | `project-pr-watcher.md` | Project-wide scheduled PR watcher discovery, review, blocker comments, protected merges, dependency-aware deployment, and durable recovery |
 
 ### Compatibility Adapters
@@ -206,7 +205,7 @@ For creating, configuring, or reviewing project-wide scheduled PR watchers, read
 - OpenCode discovers it through the project-local symlink `.opencode/agents/visual-planner.md`. No global configuration or duplicate definition is required; `opencode.json` continues to register workspace instructions and skills.
 - The agent uses `visual-explainer.md` for visual artifacts and reads other skills only when their behavior is being designed. Discuss first; write documentation when requested. Built-in Plan mode remains read-only outside its permitted plan directory.
 - Choose the target project's own `docs/` and existing conventions; default to `docs/features/<feature-name>.html`. Multiple projects may each have a `docs/` directory. Ask when ownership is unclear; use root documentation only for workspace-wide topics.
-- The agent may edit documentation only beneath exact `docs` directory segments inside `/home/lubshad/frappe-bench`. Its permissions deny shell execution, delegation, and external tools. The workspace boundary is installation-specific and must be reviewed if this catalog moves.
+- The agent may edit documentation only beneath exact `docs` directory segments inside `/home/adnan-bin-farook/frappe-bench`. Its permissions deny shell execution, delegation, and external tools. The workspace boundary is installation-specific and must be reviewed if this catalog moves.
 - Plan approval is not implementation authorization. Switch to an implementation agent for application changes, deployments, migrations, agent/skill maintenance, or validation requiring tools unavailable to the planner.
 
 ## Completion Evidence
