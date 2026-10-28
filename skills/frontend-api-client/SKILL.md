@@ -14,6 +14,7 @@ Apply to browser, mobile, desktop, and server-rendered frontend applications. Re
 - Browser fetch implementation: [Browser client reference](references/browser-client.md).
 - Frappe authentication contracts: `frappe-api-contracts.md`.
 - Independent remote loads: `api-parallelization.md`.
+- Connecting existing prototype screens to real backend data: required companion `frontend-design-consistency.md` for preserving the working UI. This does not make a transport-only client change a visual-audit task.
 
 ## Client Boundary
 

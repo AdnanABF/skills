@@ -1,18 +1,19 @@
 ---
 name: project-manager
-description: Use when analyzing live CoreAxis ERP project health, tasks, deadlines, milestones, dependencies, blockers, or risks, or preparing read-only project change plans and status briefs.
+description: Use when analyzing live CoreAxis ERP project health, tasks, deadlines, milestones, dependencies, blockers, or risks, preparing status briefs, or executing explicitly requested project changes subject to the active agent's permissions.
 ---
 
 # Project Manager
 
 ## When to Use
 
-Use for read-only CoreAxis ERP project planning and decision-oriented reports.
+Use for CoreAxis ERP project planning, decision-oriented reports, and authorized
+project and task changes.
 Read `erp-assistant.md` first: its MCP checks, interactive selection, metadata,
-privacy, permissions, read-only scope, and execution-handoff rules apply here.
+privacy, permissions, agent-mode restrictions, and execution rules apply here.
 
-Do not use this skill for generic application implementation planning or as
-authorization to create or modify Projects, Tasks, or ERP configuration.
+Do not use this skill for generic application implementation planning. Loading
+it is not authorization to create or modify Projects, Tasks, or ERP configuration.
 Skills provide instructions, not agent-level tool permission enforcement.
 
 ## Project Resolution
@@ -52,7 +53,7 @@ ambiguous references, use `question` with readable subjects and IDs. Use
 canonical IDs internally and subjects first in responses, adding IDs for
 lookup or disambiguation. Avoid reproducing long descriptions unnecessarily.
 
-## Change Planning
+## Change Planning and Execution
 
 For proposed changes to projects, tasks, milestones, dependencies, deadlines,
 priority, status, progress, ownership, or workflow:
@@ -62,14 +63,21 @@ priority, status, progress, ownership, or workflow:
 3. Validate proposed links, dates, dependencies, and allowed values.
 4. Present DocType, canonical ID, current and proposed values, dependencies,
    risks, and material side effects.
-5. State that nothing was applied. Execution needs a separately authorized,
-   write-enabled workflow outside this skill, not merely a change of agent.
+5. In Plan or for a proposal-only request, state that nothing was applied. In
+   Build or another write-capable agent, execute explicit change requests using
+   the ERP Assistant execution rules; no separate workflow or exit phrase is
+   required. A mode switch alone does not authorize unrequested changes.
 
 For new Task proposals, resolve the canonical Project ID. If omitted, propose
 the current date as the deadline and `High` as priority, clearly labeling both
-as unsaved defaults. Validate the site's milestone field and value before
-proposing a Task as a milestone. Do not bypass read-only scope with Python,
-database writes, workflow tools, or indirect document changes.
+as unsaved suggestions, not confirmed delivery commitments or authorized values.
+For execution, use user-specified values or verified site defaults; if an optional
+deadline is omitted, leave it unset rather than inventing a commitment. Ask only
+when required information or a material ambiguity remains. Validate the site's
+milestone field and value before setting a Task as a milestone. Validate dependency
+links for cycles and preserve parent/child creation order. Check for duplicate
+tasks within the resolved project before creation or retries. Never bypass agent
+restrictions or permissions with Python, database writes, or indirect changes.
 
 ## Project Analysis
 
@@ -143,8 +151,11 @@ sections briefly; keep the highest-risk work first and actions short and ordered
 
 ## Verification
 
-- Confirm read-only MCP access and the resolved canonical Project and Task IDs.
+- Confirm MCP access, active agent permissions, authorized scope, and the resolved
+  canonical Project and Task IDs.
 - Verify pagination, metadata, status semantics, timezone, and date boundaries.
 - Check dependency evidence and calculations, noting missing fields or records.
 - Distinguish facts, calculations, inferences, and unapplied recommendations.
-- Confirm no ERP records or local application code were changed.
+- In Plan or report-only work, confirm no ERP records were changed. For authorized
+  execution, verify saved values and report created/updated IDs and partial failures.
+- Confirm no local application code was changed by this ERP workflow.

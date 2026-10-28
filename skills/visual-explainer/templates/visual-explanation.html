@@ -5,112 +5,114 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Visual explanation · Replace with topic</title>
   <style>
-    :root { color-scheme:light; --ink:#172b42; --muted:#52657b; --line:#d5e0ee; --blue:#245bd6; --green:#196b45; --red:#ab303a; }
+    /* Kanit is used when installed. For bundled fonts, add verified local
+       @font-face URLs and ship the font license. Never add a font CDN. */
+    :root { color-scheme:light; --ink:#303746; --muted:#596373; --line:#dce0e6; --blue:#36597c; --green:#32634f; --red:#873c47; --lavender:#ede7f6; --sky:#e8f0fa; --mint:#e7f3ec; }
     * { box-sizing:border-box; }
-    body { margin:0; background:#f4f7fc; color:var(--ink); font:15px/1.6 system-ui,-apple-system,sans-serif; }
-    main { max-width:1180px; margin:auto; padding:44px 24px; }
-    h1 { font-size:clamp(30px,5vw,48px); line-height:1.15; letter-spacing:-1.5px; margin:12px 0; }
-    h2 { font-size:23px; margin:0 0 16px; }
-    h3 { font-size:16px; margin:0 0 12px; }
+    body { margin:0; background:#fafaf7; color:var(--ink); font:16px/1.65 Kanit,Arial,Helvetica,sans-serif; }
+    main { max-width:940px; margin:auto; padding:64px 28px 28px; }
+    h1 { font-size:clamp(30px,5vw,40px); line-height:1.2; letter-spacing:-.6px; margin:12px 0 16px; }
+    h1,h2,h3,strong,summary { font-weight:500; }
+    h2 { font-size:22px; margin:0 0 16px; }
+    h3 { font-size:16px; margin:0 0 8px; }
     p { margin:8px 0 16px; }
     small,.muted { color:var(--muted); }
-    section { margin-top:24px; padding:26px; background:white; border:1px solid var(--line); border-radius:14px; }
-    .eyebrow { color:var(--blue); text-transform:uppercase; letter-spacing:1.6px; font-size:11px; font-weight:800; }
-    .legend,.controls { display:flex; gap:9px; flex-wrap:wrap; margin:18px 0; }
-    .tag { display:inline-block; padding:4px 10px; border-radius:20px; background:#edf2fc; color:#2a4e88; font-size:12px; }
-    .tag.proposed { background:#eee8ff; color:#62419b; }
+    section { margin-top:40px; }
+    .eyebrow { color:#686075; text-transform:uppercase; letter-spacing:1px; font-size:12px; font-weight:500; }
+    .legend { display:flex; gap:9px; flex-wrap:wrap; margin:18px 0; }
+    .tag { display:inline-block; padding:4px 10px; border-radius:20px; background:var(--sky); color:#36516d; font-size:12px; }
+    .tag.proposed { background:var(--lavender); color:#59476e; }
     .tag.assumed { background:#fff3d6; color:#825b05; }
-    button { cursor:pointer; border:1px solid #bdcde3; background:white; color:var(--blue); border-radius:7px; padding:9px 14px; font:600 13px system-ui,sans-serif; }
-    button[aria-pressed="true"],button.primary { background:var(--blue); color:white; border-color:var(--blue); }
-    :focus-visible { outline:3px solid #ce8400; outline-offset:4px; }
-    .stage { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; margin:24px 0; }
-    .actor { position:relative; border:2px solid var(--line); border-radius:12px; padding:25px 15px; background:#f8faff; text-align:center; }
-    .actor:not(:last-child)::after { content:'→'; position:absolute; right:-22px; top:40%; font-size:26px; color:var(--blue); }
-    .actor.active { border-color:var(--blue); background:#edf3ff; }
-    .actor.done { border-color:#80bf9e; background:#f0faf4; }
-    .symbol { display:block; font-size:29px; margin-bottom:10px; }
+    button { cursor:pointer; min-height:44px; border:1px solid #ccd9e9; background:transparent; color:var(--blue); border-radius:8px; padding:10px 16px; font:500 14px Kanit,Arial,Helvetica,sans-serif; }
+    button:hover { background:#eef2f7; }
+    button[aria-pressed="true"],button.primary { background:var(--sky); color:#294d73; border-color:#8fa8c5; }
+    :focus-visible { outline:3px solid #765a9b; outline-offset:4px; }
+    .controls { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; margin:24px 0 20px; border-bottom:1px solid var(--line); }
+    .controls button { border:0; border-bottom:2px solid transparent; border-radius:0; margin-bottom:-1px; padding:14px 8px; }
+    .controls button[aria-pressed="true"] { border-bottom-color:#6d8fb5; }
+    .stage { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px; margin:0; padding:32px 24px; background:white; border:1px solid #e7e5e2; border-radius:16px; }
+    .actor { position:relative; border:1px solid var(--line); border-radius:10px; padding:22px 12px; background:#fafbf9; text-align:center; }
+    .actor:not(:last-child)::after { content:'→'; position:absolute; right:-21px; top:40%; font-size:20px; color:#7c8592; }
+    .actor.active { border-color:#8fa8c5; background:var(--sky); }
+    .actor.done { border-color:#a6c6b2; background:var(--mint); }
+    .actor small { min-height:42px; }
     .actor strong,.actor small { display:block; }
-    .caption { background:#f3f7ff; border-left:4px solid var(--blue); padding:16px; margin:14px 0; min-height:80px; }
+    .caption { background:white; border:1px solid #e2e5e9; border-radius:12px; padding:20px; margin:14px 0; min-height:100px; }
     .caption strong,.caption small { display:block; }
     .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-    .panel { border:1px solid var(--line); border-radius:10px; padding:20px; min-width:0; }
+    .panel { min-width:0; }
     .flow { display:flex; align-items:center; gap:12px; margin:14px 0; }
-    .node { flex:1; border:1px solid var(--line); background:#f7f9fd; border-radius:8px; padding:14px; text-align:center; min-width:0; }
+    .node { flex:1; border:1px solid var(--line); background:#f7f8fa; border-radius:8px; padding:14px; text-align:center; min-width:0; font-size:14px; }
     .arrow { color:var(--blue); font-size:22px; }
-    .yes { background:#ebf8f0; border-color:#b2d9c2; color:var(--green); }
-    .no { background:#fff0f0; border-color:#e9c0c4; color:var(--red); }
+    .yes { background:var(--mint); border-color:#cbded2; color:var(--green); }
+    .no { background:#f9ecee; border-color:#e6cdd2; color:var(--red); }
     .timeline { display:grid; grid-template-columns:repeat(3,1fr); border-top:3px solid #c5d5ed; gap:18px; margin-top:30px; }
     .moment { position:relative; padding-top:18px; }
     .moment::before { content:''; position:absolute; width:13px; height:13px; background:var(--blue); border-radius:50%; top:-8px; left:0; }
     .moment strong,.moment small { display:block; }
-    details { margin-top:20px; padding:14px 17px; border:1px solid var(--line); border-radius:8px; }
-    summary { cursor:pointer; font-weight:650; }
-    code { font:12px/1.6 ui-monospace,monospace; background:#edf2f7; padding:2px 5px; border-radius:4px; overflow-wrap:anywhere; }
-    footer { margin-top:24px; font-size:12px; color:var(--muted); }
-    @media (max-width:760px) { main { padding:25px 14px; } section { padding:20px 16px; } .stage { grid-template-columns:1fr 1fr; } .actor::after { display:none; } .grid { grid-template-columns:1fr; } .timeline { grid-template-columns:1fr; border-top:0; border-left:3px solid #c5d5ed; padding-left:20px; } .moment::before { top:24px; left:-28px; } }
+    details { margin-top:20px; padding:18px 0 0; border-top:1px solid var(--line); }
+    summary { cursor:pointer; font-size:14px; }
+    code { font:13px/1.7 Consolas,"Liberation Mono","Courier New",monospace; background:#f0f3f7; padding:2px 5px; border-radius:4px; overflow-wrap:anywhere; }
+    footer { margin-top:28px; padding-top:18px; border-top:1px solid var(--line); font-size:12px; color:var(--muted); }
+    @media (max-width:760px) { main { padding:32px 20px 20px; } .stage { grid-template-columns:1fr; gap:32px; padding:24px 16px; } .actor:not(:last-child)::after { content:'↓'; right:calc(50% - 7px); top:auto; bottom:-32px; } .actor small { min-height:0; } .controls button { padding:12px 5px; font-size:13px; } .grid { grid-template-columns:1fr; } .timeline { grid-template-columns:1fr; border-top:0; border-left:3px solid #c5d5ed; padding-left:20px; } .moment::before { top:24px; left:-28px; } }
     @media (max-width:420px) { .flow { flex-direction:column; align-items:stretch; } .arrow { align-self:center; transform:rotate(90deg); } }
-    @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
-    @media print { @page { margin:15mm; } body { background:white; font-size:11px; } main { padding:0; max-width:none; } h1 { font-size:30px; } .controls,#next-step { display:none; } section { border-radius:0; padding:16px; } .stage { grid-template-columns:repeat(4,minmax(0,1fr)); } .actor::after { display:block; } .actor,.panel,.moment { break-inside:avoid; } .grid { grid-template-columns:1fr 1fr; } .timeline { grid-template-columns:repeat(3,1fr); border-left:0; border-top:3px solid #c5d5ed; padding-left:0; } .moment::before { top:-8px; left:0; } .flow { flex-direction:row; } .arrow { transform:none; } }
+    @media (prefers-reduced-motion:no-preference) { button,.actor { transition:background .15s,border-color .15s; } }
+    @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; transition:none !important; } }
+    @media print { @page { margin:15mm; } body { background:white; font-size:11px; } main { padding:0; max-width:none; } h1 { font-size:30px; } .controls,#next-step { display:none; } section { margin-top:24px; } .stage { grid-template-columns:1fr; } .actor,.panel,.moment { break-inside:avoid; } .grid { grid-template-columns:1fr 1fr; } details > :not(summary) { display:block !important; } .flow { flex-direction:row; } .arrow { transform:none; } }
   </style>
 </head>
 <body>
-  <!-- Authoring template: replace sample content, mode labels, and stages with the actual topic. -->
+  <!-- Authoring template: adapt the actors, states, mode, and evidence to the topic.
+       Default: one diagram + one stepper + one detail panel. No live API calls.
+       Reuse local Kanit only when available; otherwise the standard fallback is intentional. -->
   <main>
     <header>
-      <div class="eyebrow">Visual explanation · sample planning view</div>
-      <h1>What happens after the user acts?</h1>
-      <p class="muted">Sample flow. Replace with the question this page answers.</p>
-      <div class="legend"><span class="tag proposed">Proposed · sample design</span><span class="tag assumed">Assumed · background processing</span></div>
+      <div class="eyebrow">Visual guide · sample</div>
+      <h1>From action to outcome.</h1>
+      <p class="muted">One action. Four stages. A clear result.</p>
+      <div class="legend"><span class="tag proposed">Proposed example · not implemented</span></div>
     </header>
 
     <section aria-labelledby="walkthrough-title">
       <h2 id="walkthrough-title">Follow the action</h2>
-      <small>Interactive illustration only · no backend calls</small>
-      <div class="controls" role="group" aria-label="Walkthrough steps">
-        <button type="button" data-step="0" aria-pressed="true">1 · Trigger</button>
-        <button type="button" data-step="1" aria-pressed="false">2 · Validate</button>
-        <button type="button" data-step="2" aria-pressed="false">3 · Process</button>
-        <button type="button" data-step="3" aria-pressed="false">4 · Result</button>
-      </div>
+      <small>Local simulation · no backend calls</small>
       <div class="stage">
-        <div class="actor active" id="actor-0"><span class="symbol" aria-hidden="true">①</span><strong>User</strong><small id="event-0">Starts an action</small></div>
-        <div class="actor" id="actor-1"><span class="symbol" aria-hidden="true">②</span><strong>Application</strong><small id="event-1">Validates the request</small></div>
-        <div class="actor" id="actor-2"><span class="symbol" aria-hidden="true">③</span><strong>Service</strong><small id="event-2">Processes valid work</small></div>
-        <div class="actor" id="actor-3"><span class="symbol" aria-hidden="true">④</span><strong>Result</strong><small id="event-3">Becomes visible to the user</small></div>
+        <div class="actor active" id="actor-0"><strong>User</strong><small id="event-0">Starts an action</small></div>
+        <div class="actor" id="actor-1"><strong>Application</strong><small id="event-1">Checks the input</small></div>
+        <div class="actor" id="actor-2"><strong>Worker</strong><small id="event-2">Processes the task</small></div>
+        <div class="actor" id="actor-3"><strong>Result</strong><small id="event-3">Shows the outcome</small></div>
       </div>
-      <div class="caption" role="status" aria-live="polite"><strong id="step-title">1 · User starts an action</strong><small id="step-note">The action enters the application.</small></div>
+      <div class="controls" role="group" aria-label="Walkthrough steps">
+        <button type="button" data-step="0" aria-pressed="true">01 · Start</button>
+        <button type="button" data-step="1" aria-pressed="false">02 · Check</button>
+        <button type="button" data-step="2" aria-pressed="false">03 · Work</button>
+        <button type="button" data-step="3" aria-pressed="false">04 · Result</button>
+      </div>
+      <div class="caption" role="status" aria-live="polite" aria-atomic="true"><strong id="step-title">1 · Start</strong><small id="step-note">The user sends a request.</small></div>
       <button type="button" class="primary" id="next-step">Next step →</button>
       <noscript><p>The diagram shows the full sequence left to right. Enable JavaScript to step through the sample.</p></noscript>
     </section>
 
     <section aria-labelledby="outcome-title">
-      <h2 id="outcome-title">Same action, different outcomes</h2>
+      <h2 id="outcome-title">If a check fails</h2>
       <div class="grid">
-        <div class="panel"><h3>✓ Valid request</h3><div class="flow"><div class="node">Checks pass</div><span class="arrow" aria-hidden="true">→</span><div class="node yes">Work accepted</div></div><small>User sees progress, then the result.</small></div>
-        <div class="panel"><h3>✕ Invalid request</h3><div class="flow"><div class="node">A check fails</div><span class="arrow" aria-hidden="true">→</span><div class="node no">No work started</div></div><small>User sees a reason and a recovery action.</small></div>
+        <div class="panel"><h3>Valid input</h3><p class="muted">Accept the task. Show progress, then the result.</p></div>
+        <div class="panel"><h3>Invalid input</h3><p class="muted">Start no work. Explain the issue and let the user fix it.</p></div>
       </div>
     </section>
 
-    <section aria-labelledby="timeline-title">
-      <h2 id="timeline-title">What changes over time?</h2>
-      <div class="timeline">
-        <div class="moment"><strong>Before</strong><div class="node">Idle</div><small>No work has started.</small></div>
-        <div class="moment"><strong>During</strong><div class="node">Processing</div><small>Progress is visible.</small></div>
-        <div class="moment"><strong>After</strong><div class="node yes">Complete</div><small>The result is available.</small></div>
-      </div>
-      <details><summary>Assumptions &amp; open decisions · sample</summary><p><span class="tag assumed">Assumed</span> Processing happens outside the UI thread.</p><p><span class="tag proposed">Undecided</span> Retry policy and cancellation behavior need a design decision.</p></details>
-    </section>
-    <footer>Authoring template · sample behavior, not a verified implementation. Replace with actual evidence and review date.</footer>
+    <details><summary>Assumptions &amp; open questions</summary><p><strong>Assumed:</strong> a worker handles the task in the background.</p><p><strong>Undecided:</strong> retry and cancellation rules.</p><p>Sample only. Add actual source references and a real review date when adapting this template.</p></details>
+    <footer>Authoring template · Local simulation · No verified implementation</footer>
   </main>
   <script>
     (() => {
       'use strict';
       const buttons = Array.from(document.querySelectorAll('[data-step]'));
       const stages = [
-        { title: '1 · User starts an action', note: 'The action enters the application.', event: 'Starts an action' },
-        { title: '2 · Application validates the request', note: 'Invalid input takes the failure path; valid input proceeds.', event: 'Checks input and permissions' },
-        { title: '3 · Service processes valid work', note: 'Proposed: work runs in the background while progress is visible.', event: 'Processes the accepted request' },
-        { title: '4 · Result becomes visible', note: 'The user sees the outcome. Persistence depends on the design.', event: 'Shows the completed result' }
+        { title: '1 · Start', note: 'The user sends a request.', event: 'Request sent' },
+        { title: '2 · Check', note: 'Check input and access. Stop if a check fails.', event: 'Checks input and access' },
+        { title: '3 · Work', note: 'Proposed: a worker runs the task. The user sees progress.', event: 'Task in progress' },
+        { title: '4 · Result', note: 'Show the outcome. What is saved depends on the design.', event: 'Outcome shown' }
       ];
       let current = 0;
       function show(index) {
@@ -118,7 +120,8 @@
         buttons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)));
         stages.forEach((stage, i) => {
           document.getElementById('actor-' + i).className = 'actor' + (i === index ? ' active' : i < index ? ' done' : '');
-          document.getElementById('event-' + i).textContent = stage.event;
+          const idle = ['Starts an action', 'Checks the input', 'Processes the task', 'Shows the outcome'];
+          document.getElementById('event-' + i).textContent = i <= index ? stage.event : idle[i];
         });
         document.getElementById('step-title').textContent = stages[index].title;
         document.getElementById('step-note').textContent = stages[index].note;

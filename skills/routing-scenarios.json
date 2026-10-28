@@ -1,5 +1,59 @@
 [
   {
+    "scenario": "Connect an existing working React prototype to real backend data without requesting a redesign; preserve its layout, components and wizard flow while allowing small targeted usability improvements",
+    "skills": ["frontend-design-consistency", "frontend-api-client"],
+    "forbidden_actions": ["replace-working-prototype-ui", "redesign-layout-without-approval", "change-wizard-steps-without-approval", "silently-remove-existing-ui-capabilities", "retain-fake-success-or-metrics"],
+    "cases": [
+      {"skills": ["frontend-design-consistency", "frontend-api-client"], "actions": ["inspect-working-prototype", "adapt-backend-view-model", "reuse-existing-components", "add-targeted-validation-feedback", "compare-before-and-after"], "valid": true},
+      {"skills": ["frontend-api-client"], "actions": ["connect-real-api"], "valid": false},
+      {"skills": ["frontend-design-consistency", "frontend-api-client"], "actions": ["replace-working-prototype-ui"], "valid": false},
+      {"skills": ["frontend-design-consistency", "frontend-api-client"], "actions": ["change-wizard-steps-without-approval"], "valid": false},
+      {"skills": ["frontend-design-consistency", "frontend-api-client"], "actions": ["silently-remove-existing-ui-capabilities"], "valid": false},
+      {"skills": ["frontend-design-consistency", "frontend-api-client"], "actions": ["retain-fake-success-or-metrics"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Redesign an existing prototype's layout and wizard sequence after the user explicitly requests and approves that UI redesign, without changing backend transport",
+    "skills": ["frontend-design-consistency"],
+    "cases": [
+      {"skills": ["frontend-design-consistency"], "actions": ["inspect-existing-ui", "apply-explicitly-approved-redesign", "compare-approved-design"], "valid": true},
+      {"skills": [], "actions": ["apply-explicitly-approved-redesign"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Create an interactive HTML mobile app screen explanation with a realistic desktop phone frame, without implementing an application",
+    "skills": ["visual-explainer", "frontend-design-consistency", "frontend-device-layout", "frontend-mobile-app-prototyping"],
+    "forbidden_actions": ["edit-application-code", "deploy", "crop-device-frame", "claim-unverified-device-model", "retain-simulated-os-chrome-on-mobile"],
+    "cases": [
+      {"skills": ["visual-explainer", "frontend-design-consistency", "frontend-device-layout", "frontend-mobile-app-prototyping"], "actions": ["edit-target-project-docs", "fit-complete-device-frame", "remove-preview-chrome-on-mobile"], "valid": true},
+      {"skills": ["visual-explainer"], "actions": ["edit-target-project-docs"], "valid": false},
+      {"skills": ["visual-explainer", "frontend-design-consistency", "frontend-device-layout", "frontend-mobile-app-prototyping"], "actions": ["claim-unverified-device-model"], "valid": false},
+      {"skills": ["visual-explainer", "frontend-design-consistency", "frontend-device-layout", "frontend-mobile-app-prototyping"], "actions": ["retain-simulated-os-chrome-on-mobile"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Restructure a crowded HTML mobile app and IoT explanation into focused dashboard review pages with persistent navigation and shared simulation controls",
+    "skills": ["visual-explainer", "frontend-design-consistency", "frontend-admin-panels", "frontend-device-layout", "frontend-mobile-app-prototyping"],
+    "forbidden_actions": ["edit-application-code", "deploy", "shrink-text-to-fit", "reset-demo-on-page-navigation", "conflate-workspace-and-app-navigation"],
+    "cases": [
+      {"skills": ["visual-explainer", "frontend-design-consistency", "frontend-admin-panels", "frontend-device-layout", "frontend-mobile-app-prototyping"], "actions": ["edit-target-project-docs", "split-focused-review-pages", "preserve-shared-demo-state", "provide-accessible-review-drawer"], "valid": true},
+      {"skills": ["visual-explainer", "frontend-design-consistency", "frontend-device-layout", "frontend-mobile-app-prototyping"], "actions": ["split-focused-review-pages"], "valid": false},
+      {"skills": ["visual-explainer", "frontend-design-consistency", "frontend-admin-panels", "frontend-device-layout", "frontend-mobile-app-prototyping"], "actions": ["reset-demo-on-page-navigation"], "valid": false},
+      {"skills": ["visual-explainer", "frontend-design-consistency", "frontend-admin-panels", "frontend-device-layout", "frontend-mobile-app-prototyping"], "actions": ["conflate-workspace-and-app-navigation"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "Create a compact architecture explanation that already fits one page and only mentions a mobile app as an actor, without designing app screens or a review dashboard",
+    "skills": ["visual-explainer"],
+    "forbidden_skills": ["frontend-mobile-app-prototyping", "frontend-admin-panels"],
+    "forbidden_actions": ["force-dashboard-shell", "add-unrequested-device-preview", "edit-application-code"],
+    "cases": [
+      {"skills": ["visual-explainer"], "actions": ["edit-target-project-docs", "keep-compact-diagram"], "valid": true},
+      {"skills": ["visual-explainer", "frontend-mobile-app-prototyping"], "actions": ["add-unrequested-device-preview"], "valid": false},
+      {"skills": ["visual-explainer"], "actions": ["force-dashboard-shell"], "valid": false}
+    ]
+  },
+  {
     "scenario": "Implement a new Flutter screen matching the existing app's overall UI and component patterns",
     "skills": ["frontend-design-consistency", "flutter-theming", "flutter-common-widgets", "flutter-linting"],
     "forbidden_actions": ["introduce-unrequested-design-language"],
@@ -18,7 +72,7 @@
     ]
   },
   {
-    "scenario": "Inspect live CoreAxis ERP customer records and propose an unapplied change through MCP",
+    "scenario": "In Plan mode, inspect live CoreAxis ERP customer records and propose an unapplied change through MCP",
     "skills": ["erp-assistant"],
     "forbidden_skills": ["project-manager"],
     "forbidden_actions": ["mutate-erp", "run-server-python", "edit-application-code"],
@@ -27,6 +81,39 @@
       {"skills": [], "actions": ["read-erp"], "valid": false},
       {"skills": ["erp-assistant"], "actions": ["mutate-erp"], "valid": false},
       {"skills": ["erp-assistant"], "actions": ["run-server-python"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "In Build mode, execute an explicit request to update a resolved CoreAxis ERP customer through supported MCP tools",
+    "skills": ["erp-assistant"],
+    "forbidden_actions": ["run-server-python", "bypass-permissions", "mutate-outside-request", "require-exit-read-only-phrase", "blind-retry-create"],
+    "cases": [
+      {"skills": ["erp-assistant"], "actions": ["validate-metadata", "read-erp", "mutate-erp", "verify-persisted-results"], "valid": true},
+      {"skills": [], "actions": ["mutate-erp"], "valid": false},
+      {"skills": ["erp-assistant"], "actions": ["bypass-permissions"], "valid": false},
+      {"skills": ["erp-assistant"], "actions": ["mutate-outside-request"], "valid": false},
+      {"skills": ["erp-assistant"], "actions": ["require-exit-read-only-phrase"], "valid": false},
+      {"skills": ["erp-assistant"], "actions": ["blind-retry-create"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "In Build mode, create the explicitly requested tasks under a resolved CoreAxis ERP project",
+    "skills": ["erp-assistant", "project-manager"],
+    "forbidden_actions": ["run-server-python", "invent-deadline", "blind-retry-create", "require-exit-read-only-phrase"],
+    "cases": [
+      {"skills": ["erp-assistant", "project-manager"], "actions": ["validate-metadata", "resolve-project", "check-duplicates", "mutate-erp", "verify-persisted-results"], "valid": true},
+      {"skills": ["erp-assistant"], "actions": ["mutate-erp"], "valid": false},
+      {"skills": ["erp-assistant", "project-manager"], "actions": ["invent-deadline"], "valid": false},
+      {"skills": ["erp-assistant", "project-manager"], "actions": ["blind-retry-create"], "valid": false}
+    ]
+  },
+  {
+    "scenario": "In Plan mode, respond to a request to create CoreAxis ERP project tasks with an unapplied plan only",
+    "skills": ["erp-assistant", "project-manager"],
+    "forbidden_actions": ["mutate-erp", "run-server-python"],
+    "cases": [
+      {"skills": ["erp-assistant", "project-manager"], "actions": ["read-erp", "present-unapplied-plan", "explain-write-agent-required"], "valid": true},
+      {"skills": ["erp-assistant", "project-manager"], "actions": ["mutate-erp"], "valid": false}
     ]
   },
   {
