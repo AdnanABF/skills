@@ -1,36 +1,40 @@
 ---
 name: erp-assistant
-description: Use when inspecting, searching, analyzing, or reporting on live CoreAxis ERP records, or preparing read-only ERP change plans through its MCP tools.
+description: Use when inspecting, searching, analyzing, reporting on, or making explicitly requested changes to live CoreAxis ERP records through MCP, subject to the active agent's permissions.
 ---
 
 # ERP Assistant
 
 ## When to Use
 
-Use for read-only work across DocTypes accessible to the authenticated user on
+Use for work across DocTypes accessible to the authenticated user on
 `erp.coreaxissolutions.in`: record lookup, comparisons, business analysis,
-reports, and proposed changes. For project health, tasks, milestones, and
+reports, proposed changes, and authorized execution. For project health, tasks, milestones, and
 deadlines, also read `project-manager.md` for the project-specific workflow.
 
 Do not activate this skill merely because application code uses Frappe. It is
-for live ERP inspection and planning, not backend implementation, deployment,
-or executing ERP mutations.
+for live ERP operations, not backend implementation or deployment.
 
 ## Scope and Safety
 
-- Keep this workflow read-only. Do not create, update, delete, submit, approve,
-  reject, transition, publish, share, or otherwise mutate ERP records or
-  configuration, including reports, dashboards, and charts.
+- Follow the active agent's permissions. In Plan or any read-only agent, only
+  inspect and propose changes; never mutate ERP state, even through a remote tool.
+- In Build or another write-capable agent, execute explicitly requested changes
+  through supported MCP tools within the user's authorized scope. Analysis-only
+  requests remain read-only. A mode switch alone is not a request to change ERP.
 - Do not edit application code, run shell commands, browse unrelated websites,
   or delegate ERP inspection. Do not use server-side Python or direct database
   writes as a fallback.
 - This skill supplies instructions, not an agent permission sandbox. Loading it
   does not disable tools or change the selected agent's permissions.
-- If execution is requested, inspect and present a proposed change plan only.
-  Say that no changes were applied. Execution requires a separate, explicitly
-  authorized write-enabled workflow outside this read-only skill. Switching
-  agents alone does not authorize writes; if the selected agent is read-only,
-  the user must also select a write-capable agent.
+- A clear creation or update request supplies authorization for that scoped
+  operation in a write-capable agent. Do not demand a special confirmation phrase,
+  an exit from this skill, or repeated authorization solely because Plan was used
+  earlier. If the active agent is read-only, present an unapplied plan and explain
+  that execution requires switching to a write-capable agent.
+- Confirm destructive or otherwise high-impact actions with their exact targets
+  and material consequences before execution. Resolve missing required inputs or
+  ambiguous scope; do not treat skill loading or tool availability as authorization.
 
 ## Required Tools
 
@@ -44,11 +48,11 @@ required input is needed. Do not substitute a numbered chat menu. If the tool
 is unavailable when selection is required, explain the limitation and stop
 that workflow rather than guessing.
 
-Use standard read-only MCP tools for search, metadata, documents, analysis,
-reports, pending approvals, and existing dashboards. A tool's availability or
-name is not proof that an operation is read-only: inspect its contract and
-avoid any operation that persists or publishes state. Never use
-`run_python_code`, arbitrary scripts, or write-capable tools. Database queries,
+Use standard MCP tools for search, metadata, documents, analysis, reports,
+pending approvals, and dashboards. Inspect each tool's contract for side effects;
+only use mutation tools when both agent permissions and the user's request allow
+the operation. Never use `run_python_code`, arbitrary scripts, or direct database
+writes as an alternative to supported ERP operations. Database queries,
 if needed for analysis, must be read-only and respect user permissions; do not
 use arbitrary SQL to build reports or dashboards.
 
@@ -81,13 +85,34 @@ use arbitrary SQL to build reports or dashboards.
 
 For a proposed change, include the target DocType and canonical IDs, current
 and proposed values, validation requirements, dependencies, and likely side
-effects. Resolve ambiguity with `question`. Clearly mark the plan as not
-applied and explain the separate authorization needed for execution.
+effects. Resolve ambiguity with `question`. Clearly mark unapplied plans as such;
+do not imply that a proposal or suggested default has been authorized or saved.
 
 For report, dashboard, or chart proposals, validate source DocTypes, reports,
 fields, filters, roles, and chart sources. Explain what users would see and
-any role or visibility impact. Inspect existing artifacts using read-only
-tools; do not create, update, share, publish, or delete them.
+any role or visibility impact. Inspection and proposals remain read-only;
+creating, updating, sharing, publishing, or deleting artifacts follows the same
+agent-permission and user-authorization rules as other ERP writes.
+
+## Executing Authorized Changes
+
+1. Confirm that the active agent permits writes and the request identifies the
+   intended operation and scope. Validate metadata, required fields, canonical
+   targets, linked records, allowed values, and relevant workflow transitions.
+2. Read current records before updating them. Change only requested fields and
+   check for material changes since a prior plan; clarify conflicts rather than
+   overwriting unrelated work. For creation, check for existing matching records.
+3. Use documented MCP mutation tools and normal ERP validation. If the tool does
+   not support the operation, explain the limitation without a code/SQL fallback.
+4. For batches, resolve scope and dependencies first, track results per item,
+   and stop dependent operations when a prerequisite fails. Do not assume a batch
+   is atomic or silently roll back successful items through further mutations.
+5. After a timeout or uncertain response, inspect ERP state before retrying.
+   Do not blindly repeat creates, submissions, or other non-idempotent actions.
+6. Read back affected records or inspect equivalent authoritative results to
+   verify persisted values. Report canonical IDs, verified changes, failures,
+   skipped items, and uncertain results separately. Never claim full success
+   from a request being sent alone.
 
 ## Failures and Output
 
@@ -98,14 +123,17 @@ instead of using server-side code as a workaround.
 
 Be concise and operational. Use readable labels and canonical IDs where they
 help identify records. Put decisions, risks, validation failures, and required
-user actions first. Never claim that a recommendation was saved.
+user actions first. Never claim that a recommendation was saved unless execution
+and the persisted result were verified.
 
 ## Verification
 
-- Confirm the MCP connection and use only read-only operations.
+- Confirm the MCP connection, active agent permissions, and authorized scope.
+- In Plan or analysis-only work, confirm that no mutations were performed.
 - Verify metadata, canonical IDs, filters, and pagination coverage.
 - Check that ambiguity was resolved and permissions and sensitive data were
   respected.
 - Label facts, calculations, assumptions, and unapplied proposals accurately.
-- Report missing data, failed tools, and incomplete coverage; do not claim
-  that ERP state changed.
+- For writes, verify persisted results, duplicate prevention, and partial failures.
+- Report missing data, failed tools, and incomplete coverage; claim ERP changes
+  only when supported by verified results.

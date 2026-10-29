@@ -62,9 +62,9 @@ Apply one scale variable to the complete chassis. Do not separately scale the ap
 
 ## Desktop Rules
 
-- Use three grid columns for review settings, screen journey, and the remaining device area. Give both sidebars bounded heights and independent content scrollers; long settings/scenario content must not consume the journey list's height.
+- Choose the shell variant from the parent skill. For an extended journey, use three grid columns for review settings, screen journey, and the remaining device area. Give both sidebars bounded heights and independent content scrollers; long settings/scenario content must not consume the journey list's height. For a compact dashboard review, use one persistent page sidebar with shared utilities, a compact top bar, and the remaining workspace for the selected page.
 - Keep concept/role/scenario controls and reset in settings. Put grouped screen links, active state, and progress in the journey column. Its accessible settings toggle must remain available while settings are hidden.
-- Collapse settings by changing the review grid, not by covering or remounting the product. The remaining-space observer must re-fit the phone on both collapse and expansion. At mobile widths, hide both sidebars and reset both expanded and collapsed grids to a single product column.
+- Collapse settings by changing the review grid, not by covering or remounting the product. The remaining-space observer must re-fit the phone on both collapse and expansion. At mobile widths, hide desktop sidebars and reset both expanded and collapsed grids to a single product column. A dashboard review may provide a focus-managed drawer for review pages; do not retain simulated hardware or OS chrome on actual mobile views.
 - Use a fixed logical viewport inside the frame.
 - Center the device within the remaining review area.
 - Keep device labels and journey controls unscaled.

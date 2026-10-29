@@ -60,7 +60,20 @@ Exact paths and syntax belong to the selected platform adapter.
 
 ## Desktop Client Review Shell
 
-The desktop presentation uses three stable columns when review settings and journey navigation are both present:
+Choose the review shell to fit the explanation, not to force all content into one view. A compact single-screen concept may use a focused device preview. If distinct screens, diagrams, or controls do not fit comfortably together, or the user requests persistent page navigation, use the dashboard review variant below. Do not shrink text or stack every view into a long page to avoid choosing a shell.
+
+### Dashboard review variant
+
+- Read `frontend-admin-panels.md` for admin-shell behavior; `visual-explainer.md` owns documentation presentation and evidence labels when this is an HTML explanation.
+- Use a persistent desktop sidebar, compact title/status top bar, and bounded main workspace. Put the mobile frame and any synchronized companion visual on the Controls/preview page; move history, device details, architecture, or safety into separate pages only when relevant.
+- Give workspace pages direct links and an active indicator. Keep a small set of shared scenario, recovery, and reset controls reachable in the sidebar utility area. Keep long sidebar content independently scrollable.
+- Preserve service/demo state, pending actions, and app screen selection across workspace navigation. The review dashboard is not part of the mobile product: workspace links and in-app navigation are separate layers.
+- On narrow screens, use an accessible menu/drawer if review pages must remain available, while removing the decorative device frame and simulated OS chrome. Manage focus, close on Escape, and return focus to the opener. A product-only mobile view may instead hide review navigation entirely.
+- Keep the complete phone fitted to remaining space. Page content may scroll internally; the desktop shell, top bar, navigation, and utility controls should not scroll off the document.
+
+### Extended journey review variant
+
+Use three stable columns when extensive review settings and a long ordered journey both need dedicated space:
 
 - **Review settings:** branding, a short concept introduction, concept and role/persona selectors, scenario controls, and reset-demo action.
 - **Screen journey:** a dedicated full-height, independently scrolling screen/task navigator, with an active-screen indicator and current position/total count.
@@ -68,7 +81,7 @@ The desktop presentation uses three stable columns when review settings and jour
 
 Do not squeeze a long journey list below settings, introductory copy, and scenario controls in a single sidebar. Group journey entries by product phase or role when useful, preserving their sequence and direct navigation. Settings content scrolls independently when expanded scenarios exceed its available height; keep reset and journey progress reachable.
 
-Use compact, readable sidebar widths before reducing device space. Provide an accessible settings-panel toggle in the journey header so narrower desktop windows can retain journey navigation and a useful preview. Collapsing or expanding settings must re-fit the device without remounting or resetting the app. At the mobile/tablet fallback, hide both review sidebars and remove desktop column constraints.
+Use compact, readable sidebar widths before reducing device space. Provide an accessible settings-panel toggle in the journey header so narrower desktop windows can retain journey navigation and a useful preview. Collapsing or expanding settings must re-fit the device without remounting or resetting the app. At the mobile/tablet fallback, hide both desktop review sidebars and remove desktop column constraints; use the dashboard variant's drawer if access to review pages is required.
 
 The review sidebars collectively should include:
 
@@ -127,7 +140,7 @@ Follow the shared Safe Areas rules and verification in `frontend-device-layout.m
 
 On actual mobile and tablet-width browsers:
 
-- Hide the desktop journey navigator.
+- Hide the desktop journey navigator. For dashboard reviews that retain review-page access, expose it through an accessible drawer, not persistent desktop columns.
 - Remove the decorative hardware frame.
 - Hide simulated operating-system chrome, including prototype status bars, clocks, signal indicators, and home indicators. These belong only to the desktop device preview.
 - Render the product edge-to-edge at the real browser viewport.
@@ -174,8 +187,8 @@ Confirm that:
 - Continuously resizing the window keeps the whole frame, side controls, label, and stepper visible without desktop document overflow. Include short laptop heights such as `540` and `600`, and sizes between the standard verification points.
 - Browser zoom at 125%, 150%, and 200%, increased default text size, loaded fonts, and device/profile changes trigger a correct fit or the intended mobile fallback. Verify actual element bounds rather than screenshots alone.
 - Previous and next controls remain visible and reachable.
-- The left journey navigator scrolls independently.
-- Settings and journey occupy separate desktop columns; expanding scenarios does not shorten the journey list. Verify grouped navigation, settings collapse/expand, persistent reset/progress controls, and device re-fitting. Both sidebars disappear at the mobile fallback, including when settings were previously collapsed.
+- The left journey navigator scrolls independently when present. For dashboard reviews, verify persistent page navigation, active links, shared scenario/recovery/reset controls, state preservation during pending actions, and narrow-screen drawer focus/Escape behavior.
+- For the extended journey variant, settings and journey occupy separate desktop columns; expanding scenarios does not shorten the journey list. Verify grouped navigation, settings collapse/expand, persistent reset/progress controls, and device re-fitting. Both desktop sidebars disappear at the mobile fallback, including when settings were previously collapsed; a review drawer may replace them when needed.
 - Every journey entry opens the intended screen or state.
 - Reset restores deterministic demo state.
 - No content is obscured by a Dynamic Island, notch, home indicator, or unsafe edge.
